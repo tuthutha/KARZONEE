@@ -151,14 +151,14 @@ const CarCard = ({ car, onEdit, onDelete }) => {
                         onClick={() => onEdit(car)}
                         className={`flex items-center ${styles.textOrange} hover:text-orange-300 transition-colors`}
                     >
-                        <FaEdit className="mr-1" /> Edit
+                        <FaEdit className="mr-1" /> Chỉnh sửa
                     </button>
 
                     <button
                         onClick={() => onDelete(car._id ?? car.id)}
                         className={`flex items-center ${styles.textRed} hover:text-red-300 transition-colors`}
                     >
-                        <FaTrash className="mr-1" /> Delete
+                        <FaTrash className="mr-1" /> Xóa
                     </button>
                 </div>
             </div>
@@ -355,7 +355,7 @@ const FilterSelect = ({ value, onChange, categories }) => (
         className={`${styles.gradientGray} ${styles.rounded2xl} ${styles.filterSelect} ${styles.borderGray} ${styles.borderHoverOrange}`}
     >
         <label className={`block text-sm font-medium ${styles.textGray} mb-2`}>
-            Filter by Category
+            Lọc theo loại xe
         </label>
         <div className="relative">
             <select
@@ -365,7 +365,7 @@ const FilterSelect = ({ value, onChange, categories }) => (
             >
                 {categories.map((c) => (
                     <option key={c} value={c}>
-                        {c === "all" ? "All Categories" : c}
+                        {c === "all" ? "Tất cả loại xe" : c}
                     </option>
                 ))}
             </select>
@@ -419,7 +419,7 @@ const ManageCar = () => {
     const handleDelete = async (identifier) => {
         const car = cars.find((c) => c._id === identifier || c.id === identifier);
         if (!car) return toast.error("Car not found");
-        if (!window.confirm("Are you sure you want to delete this car?")) return;
+        if (!window.confirm("Bạn có chắc chắn muốn xóa xe này không?")) return;
 
         try {
             if (!car._id) {
@@ -429,7 +429,7 @@ const ManageCar = () => {
             }
 
             await api.delete(`/api/cars/${car._id}`);
-            toast.success("Car deleted");
+            toast.success("Xe đã được xóa thành công");
             fetchCars();
         } catch (err) {
             console.error(err);
@@ -474,19 +474,18 @@ const ManageCar = () => {
 
                 <h1 className="text-4xl font-extrabold py-4 text-white sm:text-5xl mb-3 tracking-wide">
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400">
-                        Fleet Management
+                        Quản Lý Xe
                     </span>
                 </h1>
 
                 <p className="text-gray-400 max-w-2xl mx-auto">
-                    Manage your entire fleet, track bookings, and monitor vehicle status
-                    in real-time
+                    Quản lý toàn bộ xe, theo dõi đơn đặt xe và trạng thái xe theo thời gian thực
                 </p>
             </div>
 
             <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-5 mb-6 border border-gray-800">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <StatCard title="Total Cars" value={cars.length} icon={FaCar} />
+                    <StatCard title="Tổng số xe" value={cars.length} icon={FaCar} />
                     <FilterSelect
                         value={categoryFilter}
                         onChange={setCategoryFilter}

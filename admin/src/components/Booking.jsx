@@ -254,6 +254,11 @@ const BookingCardDetails = ({ booking }) => (
                     label="Total Amount"
                     value={`$${booking.amount}`}
                 />
+                <Detail
+                    icon={<FaMapMarkerAlt />}
+                    label="Hình thức nhận xe"
+                    value={booking.deliveryMethod}
+                />
             </Panel>
 
             <Panel
@@ -504,6 +509,8 @@ const Booking = () => {
                     bookingDate: b.bookingDate || b.createdAt || "",
                     status: (b.status || "pending").toString(),
                     amount: b.amount ?? b.total ?? 0,
+                    pickupAtStore: Boolean(b.pickupAtStore),
+                    deliveryMethod: b.pickupAtStore ? "Nhận xe tại cửa hàng" : "Giao xe tận nơi",
                     details,
                     address: {
                         street:

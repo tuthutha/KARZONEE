@@ -49,6 +49,19 @@ export const createBooking = async (req, res) => {
   session.startTransaction();
 
   try {
+    // let {
+    //   customer,
+    //   email,
+    //   phone,
+    //   car,
+    //   pickupDate,
+    //   returnDate,
+    //   amount,
+    //   details,
+    //   address,
+    //   carImage,
+    // } = req.body;
+
     let {
       customer,
       email,
@@ -60,6 +73,8 @@ export const createBooking = async (req, res) => {
       details,
       address,
       carImage,
+      pickupAtStore,
+      acceptTerms,
     } = req.body;
 
     if (!customer || !email || !car || !pickupDate || !returnDate) {
@@ -68,6 +83,15 @@ export const createBooking = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: 'Missing required fields' });
+    }
+
+    if (!acceptTerms) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng chấp nhận các Điều khoản & Điều kiện',
+      });
     }
 
     const pickup = new Date(pickupDate);
@@ -148,6 +172,8 @@ export const createBooking = async (req, res) => {
       amount: Number(amount || 0),
       details: tryParseJSON(details),
       address: tryParseJSON(address),
+      pickupAtStore: Boolean(pickupAtStore),
+      acceptTerms: Boolean(acceptTerms),
       paymentStatus: 'pending',
       status: 'pending',
     };
@@ -155,21 +181,22 @@ export const createBooking = async (req, res) => {
     const createdArr = await Booking.create([bookingData], { session });
     const createdBooking = createdArr[0];
 
-    const bookingEntry = {
-      bookingId: createdBooking._id,
-      pickupDate: createdBooking.pickupDate,
-      returnDate: createdBooking.returnDate,
-      status: createdBooking.status,
-    };
+    // const bookingEntry = {
+    //   bookingId: createdBooking._id,
+    //   pickupDate: createdBooking.pickupDate,
+    //   returnDate: createdBooking.returnDate,
+    //   status: createdBooking.status,
+    // };
 
-    await Car.findByIdAndUpdate(
-      carId,
-      { $push: { bookings: bookingEntry } },
-      { session },
-    );
+    // await Car.findByIdAndUpdate(
+    //   carId,
+    //   { $push: { bookings: bookingEntry } },
+    //   { session },
+    // );
     await session.commitTransaction();
     session.endSession();
-    const saved = await Booking.findById(createBooking._id).learn();
+    // const saved = await Booking.findById(createBooking._id).learn();
+    const saved = await Booking.findById(createdBooking._id).lean();
     return res.status(201).json({
       success: true,
       booking: saved,
@@ -291,6 +318,8 @@ export const updateBooking = async (req, res, next) => {
       'bookingDate',
       'status',
       'amount',
+      'pickupAtStore',
+      'acceptTerms',
       'details',
       'address',
     ];

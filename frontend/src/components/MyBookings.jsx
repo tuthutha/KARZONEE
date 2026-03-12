@@ -43,10 +43,10 @@ const formatDate = (dateString) => {
   return Number.isNaN(d.getTime())
     ? String(dateString)
     : d.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 };
 
 const formatPrice = (price) => {
@@ -132,9 +132,8 @@ const normalizeBooking = (booking) => {
       phone: booking.phone || safeAccess(() => booking.user?.phone) || "",
       address:
         address.street || address.city || address.state
-          ? `${address.street || ""}${address.city ? ", " + address.city : ""}${
-              address.state ? ", " + address.state : ""
-            }`
+          ? `${address.street || ""}${address.city ? ", " + address.city : ""}${address.state ? ", " + address.state : ""
+          }`
           : safeAccess(() => booking.user?.address) || "",
     },
     dates: { pickup: pickupDate, return: returnDate },
@@ -183,20 +182,30 @@ const FilterButton = ({ filterKey, currentFilter, icon, label, onClick }) => (
 );
 
 const StatusBadge = ({ status }) => {
+  // const map = {
+  //   completed: {
+  //     text: "Completed",
+  //     color: "bg-green-500",
+  //     icon: <FaCheckCircle />,
+  //   },
+  //   upcoming: {
+  //     text: "Upcoming",
+  //     color: "bg-blue-500",
+  //     icon: <FaClock />
+  //   },
+  //   cancelled: {
+  //     text: "Cancelled",
+  //     color: "bg-red-500",
+  //     icon: <FaTimesCircle />,
+  //   },
+  //   default: { text: "Unknown", color: "bg-gray-500", icon: null },
+  // };
   const map = {
-    completed: {
-      text: "Completed",
-      color: "bg-green-500",
-      icon: <FaCheckCircle />,
-    },
-    upcoming: { text: "Upcoming", color: "bg-blue-500", icon: <FaClock /> },
-    cancelled: {
-      text: "Cancelled",
-      color: "bg-red-500",
-      icon: <FaTimesCircle />,
-    },
-    default: { text: "Unknown", color: "bg-gray-500", icon: null },
-  };
+  completed: { text: "Đã hoàn thành", color: "bg-green-500", icon: <FaCheckCircle /> },
+  upcoming: { text: "Sắp tới", color: "bg-blue-500", icon: <FaClock /> },
+  cancelled: { text: "Đã hủy", color: "bg-red-500", icon: <FaTimesCircle /> },
+  default: { text: "Không xác định", color: "bg-gray-500", icon: null },
+};
   const { text, color, icon } = map[status] || map.default;
   return (
     <div
@@ -300,7 +309,7 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
                   onClick={() => onCancel(booking.id)}
                   className={s.cancelButton}
                 >
-                  Cancel Booking
+                  Hủy Đặt Xe
                 </button>
               )}
               <button
@@ -496,10 +505,10 @@ const MyBookings = () => {
       const rawData = Array.isArray(response.data)
         ? response.data
         : response.data?.data ||
-          response.data?.bookings ||
-          response.data?.rows ||
-          response.data ||
-          [];
+        response.data?.bookings ||
+        response.data?.rows ||
+        response.data ||
+        [];
 
       const normalized = (Array.isArray(rawData) ? rawData : []).map(
         normalizeBooking
@@ -515,8 +524,8 @@ const MyBookings = () => {
       } else {
         setError(
           err.response?.data?.message ||
-            err.message ||
-            "Failed to load bookings"
+          err.message ||
+          "Failed to load bookings"
         );
       }
       setLoading(false);
@@ -532,7 +541,7 @@ const MyBookings = () => {
 
   const cancelBooking = useCallback(
     async (bookingId) => {
-      if (!window.confirm("Are you sure you want to cancel this booking?"))
+      if (!window.confirm("Bạn có chắc chắn muốn hủy đặt xe này không?"))
         return;
       try {
         const token = localStorage.getItem("token");
@@ -548,7 +557,7 @@ const MyBookings = () => {
 
         const updated = normalizeBooking(
           response.data ||
-            response.data?.data || { _id: bookingId, status: "cancelled" }
+          response.data?.data || { _id: bookingId, status: "cancelled" }
         );
         setBookings((prev) =>
           prev.map((b) => (b.id === bookingId ? updated : b))
@@ -557,8 +566,8 @@ const MyBookings = () => {
       } catch (err) {
         alert(
           err.response?.data?.message ||
-            err.message ||
-            "Failed to cancel booking"
+          err.message ||
+          "Failed to cancel booking"
         );
       }
     },

@@ -42,6 +42,8 @@ const bookingSchema = new Schema(
       default: 'pending',
     },
     amount: { type: Number, default: 0 },
+    pickupAtStore: { type: Boolean, default: false },
+    acceptTerms: { type: Boolean, default: false },
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid'],

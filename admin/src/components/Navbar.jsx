@@ -5,9 +5,9 @@ import logo from "../assets/logocar.png";
 import { CalendarCheck, Car, PlusCircle, Menu, X } from 'lucide-react';
 
 const navLinks = [
-    { path: "/", icon: PlusCircle, label: "Add Car" },
-    { path: "/manage-cars", icon: Car, label: "Manage Cars" },
-    { path: "/bookings", icon: CalendarCheck, label: "Bookings" },
+    { path: "/", icon: PlusCircle, label: "Thêm xe" },
+    { path: "/manage-cars", icon: Car, label: "Quản lý xe" },
+    { path: "/bookings", icon: CalendarCheck, label: "Đơn đặt xe" },
 ];
 
 const Navbar = () => {

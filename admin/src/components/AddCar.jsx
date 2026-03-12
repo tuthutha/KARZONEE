@@ -168,7 +168,7 @@ const AddCar = () => {
                 }
             >
                 {field.icon}
-                {field.name}
+                {field.label}
             </label>
 
             <input
@@ -220,9 +220,9 @@ const AddCar = () => {
             type: "input",
             config: {
                 name: "carName",
-                label: "Car Name",
+                label: "Tên xe",
                 required: true,
-                placeholder: "e.g., Toyota Camry",
+                placeholder: "VD: Toyota Camry",
                 icon: (
                     <svg
                         className={AddCarPageStyles.iconSmall}
@@ -244,24 +244,24 @@ const AddCar = () => {
             type: "input",
             config: {
                 name: "dailyPrice",
-                label: "Daily Price ($)",
+                label: "Giá thuê mỗi ngày (đ)",
                 type: "number",
                 required: true,
                 min: "1",
                 placeholder: "45",
                 props: { className: "pl-8" },
-                prefix: <span className="absolute left-3 top-3 text-gray-400">$</span>,
+                prefix: <span className="absolute left-3 top-3 text-gray-400">đ</span>,
             },
         },
         {
             type: "select",
             config: {
                 name: "seats",
-                label: "Seats",
+                label: "Số chỗ",
                 required: true,
                 options: [2, 4, 5, 6, 7, 8].map((n) => ({
                     value: n,
-                    label: `${n} seats`,
+                    label: `${n} chỗ`,
                 })),
             },
         },
@@ -269,16 +269,16 @@ const AddCar = () => {
             type: "select",
             config: {
                 name: "fuelType",
-                label: "Fuel Type",
+                label: "Loại nhiên liệu",
                 required: true,
-                options: ["Petrol", "Diesel", "Electric", "Hybrid", "CNG"],
+                options: ["Xăng", "Dầu", "Điện", "Hybrid"],
             },
         },
         {
             type: "input",
             config: {
                 name: "mileage",
-                label: "Mileage (MPG)",
+                label: "Mức tiêu hao nhiên liệu (MPG)",
                 type: "number",
                 required: true,
                 min: "1",
@@ -289,7 +289,7 @@ const AddCar = () => {
             type: "select",
             config: {
                 name: "category",
-                label: "Category",
+                label: "Loại xe",
                 required: true,
                 options: ["Sedan", "SUV", "Sports", "Coupe", "Hatchback", "Luxury"],
             },
@@ -301,7 +301,7 @@ const AddCar = () => {
             type: "input",
             config: {
                 name: "year",
-                label: "Year",
+                label: "Năm sản xuất",
                 type: "number",
                 required: true,
                 min: "1990",
@@ -313,9 +313,9 @@ const AddCar = () => {
             type: "input",
             config: {
                 name: "model",
-                label: "Model",
+                label: "Phiên bản",
                 required: true,
-                placeholder: "e.g., XLE",
+                placeholder: "VD: 2.5Q",
             },
         },
     ];
@@ -335,11 +335,11 @@ const AddCar = () => {
                 </div>
 
                 <h1 className={AddCarPageStyles.title}>
-                    <span className={AddCarPageStyles.titleGradient}>Add Your Car</span>
+                    <span className={AddCarPageStyles.titleGradient}>Thêm Xe Của Bạn</span>
                 </h1>
 
                 <p className={AddCarPageStyles.subtitle}>
-                    Share your vehicle with the world and start earning today
+                    Chia sẻ xe của bạn với mọi người và bắt đầu kiếm tiền ngay hôm nay
                 </p>
             </div>
 
@@ -379,9 +379,9 @@ const AddCar = () => {
                                 return null;
                             })}
                             <div>
-                                <label className={AddCarPageStyles.label}>Transmission</label>
+                                <label className={AddCarPageStyles.label}>Hộp số</label>
                                 <div className={AddCarPageStyles.radioContainer}>
-                                    {['Automatic', 'Manual'].map((t) => (
+                                    {['Số tự động', 'Số sàn'].map((t) => (
                                         <label
                                             key={t}
                                             className={AddCarPageStyles.radioLabel(
@@ -414,7 +414,7 @@ const AddCar = () => {
                             </div>
 
                             <div>
-                                <label className={AddCarPageStyles.label}>Car Image</label>
+                                <label className={AddCarPageStyles.label}>Hình ảnh xe</label>
                                 <div className={AddCarPageStyles.imageUploadContainer}>
                                     <label className={AddCarPageStyles.imageUploadLabel}>
                                         {data.imagePreview ? (
@@ -466,7 +466,7 @@ const AddCar = () => {
                             </div>
 
                             <div>
-                                <label className={AddCarPageStyles.label}>Description</label>
+                                <label className={AddCarPageStyles.label}>Mô tả</label>
                                 <textarea
                                     required
                                     name="description"
@@ -474,7 +474,7 @@ const AddCar = () => {
                                     onChange={handleChange}
                                     rows="4"
                                     className={AddCarPageStyles.textarea}
-                                    placeholder="Describe features, condition, special details..."
+                                    placeholder="Mô tả đặc điểm, tình trạng và các chi tiết đặc biệt của xe..."
                                 />
                             </div>
                         </div>
@@ -482,7 +482,7 @@ const AddCar = () => {
 
                     <div className="mt-12 flex justify-center">
                         <button type="submit" className={AddCarPageStyles.submitButton}>
-                            <span className={AddCarPageStyles.buttonText}>List Your Car</span>
+                            <span className={AddCarPageStyles.buttonText}>Thêm Xe Ngay</span>
                             <svg
                                 className={AddCarPageStyles.iconInline}
                                 fill="none"

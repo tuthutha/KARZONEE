@@ -75,6 +75,17 @@ const CarDetail = () => {
   const [loadingCar, setLoadingCar] = useState(false);
   const [carError, setCarError] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
+  // const [formData, setFormData] = useState({
+  //   pickupDate: "",
+  //   returnDate: "",
+  //   pickupLocation: "",
+  //   name: "",
+  //   email: "",
+  //   phone: "",
+  //   city: "",
+  //   state: "",
+  //   zipCode: "",
+  // });
   const [formData, setFormData] = useState({
     pickupDate: "",
     returnDate: "",
@@ -85,6 +96,8 @@ const CarDetail = () => {
     city: "",
     state: "",
     zipCode: "",
+    acceptTerms: false,
+    pickupAtStore: false,
   });
   const [activeField, setActiveField] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -138,7 +151,7 @@ const CarDetail = () => {
     return () => {
       try {
         controller.abort();
-      } catch {}
+      } catch { }
       fetchControllerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,9 +172,17 @@ const CarDetail = () => {
   const days = calculateDays(formData.pickupDate, formData.returnDate);
   const calculateTotal = () => days * price;
 
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((f) => ({ ...f, [name]: value }));
+  // };
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((f) => ({ ...f, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((f) => ({
+      ...f,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -175,11 +196,26 @@ const CarDetail = () => {
       return;
     }
 
+    if (!formData.acceptTerms) {
+      toast.error("Vui lòng chấp nhận các Điều khoản & Điều kiện");
+      return;
+    }
+
+    if (!formData.pickupAtStore && !formData.pickupLocation.trim()) {
+      toast.error("Vui lòng nhập địa điểm nhận xe.");
+      return;
+    }
+
+    if (new Date(formData.returnDate) < new Date(formData.pickupDate)) {
+      toast.error("Ngày trả xe phải bằng hoặc sau ngày nhận xe.");
+      return;
+    }
+
     setSubmitting(true);
     if (submitControllerRef.current) {
       try {
         submitControllerRef.current.abort();
-      } catch {}
+      } catch { }
     }
     const controller = new AbortController();
     submitControllerRef.current = controller;
@@ -188,6 +224,29 @@ const CarDetail = () => {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user?.id;
       const token = localStorage.getItem("token");
+      // const payload = {
+      //   userId,
+      //   customer: formData.name,
+      //   email: formData.email,
+      //   phone: formData.phone,
+      //   car: {
+      //     id: car._id ?? car.id ?? null,
+      //     name: car.name ?? `${car.make ?? ""} ${car.model ?? ""}`.trim(),
+      //   },
+      //   pickupDate: formData.pickupDate,
+      //   returnDate: formData.returnDate,
+      //   amount: calculateTotal(),
+      //   details: { pickupLocation: formData.pickupLocation },
+      //   address: {
+      //     city: formData.city,
+      //     state: formData.state,
+      //     zipCode: formData.zipCode,
+      //   },
+      //   carImage: car.image
+      //     ? buildImageSrc(Array.isArray(car.image) ? car.image[0] : car.image)
+      //     : undefined,
+      // };
+
       const payload = {
         userId,
         customer: formData.name,
@@ -200,7 +259,11 @@ const CarDetail = () => {
         pickupDate: formData.pickupDate,
         returnDate: formData.returnDate,
         amount: calculateTotal(),
-        details: { pickupLocation: formData.pickupLocation },
+        pickupAtStore: formData.pickupAtStore,
+        acceptTerms: formData.acceptTerms,
+        details: {
+          pickupLocation: formData.pickupAtStore ? "Nhận xe tại cửa hàng" : formData.pickupLocation,
+        },
         address: {
           city: formData.city,
           state: formData.state,
@@ -210,31 +273,61 @@ const CarDetail = () => {
           ? buildImageSrc(Array.isArray(car.image) ? car.image[0] : car.image)
           : undefined,
       };
+
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
+      // const res = await api.post(
+      //   `/api/payments/create-checkout-session`,
+      //   payload,
+      //   {
+      //     headers,
+      //     signal: controller.signal,
+      //   }
+      // );
+
+      // const res = await api.post(
+      //   `/api/bookings`,
+      //   payload,
+      //   { headers, signal: controller.signal }
+      // );
+
+      // if (res?.data?.url) {
+      //   toast.success("Đang chuyển đến trang thanh toán...", {
+      //     position: "top-right",
+      //     autoClose: 1200,
+      //   });
+      //   window.location.href = res.data.url;
+      //   return;
+      // }
+
+      // toast.success(
+      //   "Bạn đã đặt xe thành công!",
+      //   { position: "top-right", autoClose: 2000 }
+      // );
+      // setFormData({
+      //   pickupDate: "",
+      //   returnDate: "",
+      //   pickupLocation: "",
+      //   name: "",
+      //   email: "",
+      //   phone: "",
+      //   city: "",
+      //   state: "",
+      //   zipCode: "",
+      // });
+      // navigate("/bookings");
       const res = await api.post(
-        `/api/payments/create-checkout-session`,
+        `/api/bookings`,
         payload,
-        {
-          headers,
-          signal: controller.signal,
-        }
+        { headers, signal: controller.signal }
       );
 
-      if (res?.data?.url) {
-        toast.success("Đang chuyển đến trang thanh toán...", {
-          position: "top-right",
-          autoClose: 1200,
-        });
-        window.location.href = res.data.url;
-        return;
-      }
+      toast.success("Bạn đã đặt xe thành công!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
 
-      toast.success(
-        "Bạn đã đặt xe thành công!",
-        { position: "top-right", autoClose: 2000 }
-      );
       setFormData({
         pickupDate: "",
         returnDate: "",
@@ -245,7 +338,10 @@ const CarDetail = () => {
         city: "",
         state: "",
         zipCode: "",
+        acceptTerms: false,
+        pickupAtStore: false,
       });
+
       navigate("/bookings");
     } catch (err) {
       const canceled =
@@ -671,14 +767,46 @@ const CarDetail = () => {
                   </div>
                 </div>
 
+                <div className="space-y-3 mt-4">
+                  <label className="flex items-start gap-3 text-sm text-gray-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="pickupAtStore"
+                      checked={formData.pickupAtStore}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                    />
+                    <span>Nhận xe tại cửa hàng</span>
+                  </label>
+
+                  <label className="flex items-start gap-3 text-sm text-gray-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="acceptTerms"
+                      checked={formData.acceptTerms}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                    />
+                    <span>
+                      Bằng việc đặt xe, bạn đồng ý với các <b>Điều khoản &amp; Điều kiện</b>
+                    </span>
+                  </label>
+                </div>
+
                 <button
                   type="submit"
                   disabled={submitting}
                   className={carDetailStyles.submitButton}
                 >
-                  <FaCreditCard className="mr-2 group-hover:scale-110 transition-transform" />
-                  <span>
-                    {submitting ? "Confirming..." : "Confirm Booking"}
+                  {/* <FaCreditCard className="mr-2 group-hover:scale-110 transition-transform" /> */}
+                  {/* <span>
+                    {submitting ? "Đang đặt xe..." : "Đặt Xe Ngay"}
+                  </span> */}
+                  <span
+                    type="submit"
+                    className={carDetailStyles.submitButton}
+                  >
+                    {submitting ? "Đang xử lý..." : "Đặt Xe Ngay"}
                   </span>
                 </button>
               </form>
