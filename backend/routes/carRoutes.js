@@ -12,9 +12,11 @@ const carRouter = express.Router();
 
 carRouter.get('/', getCars);
 carRouter.get('/:id', getCarById);
-carRouter.post('/', uploads.single('image'), createCar);
+// carRouter.post('/', uploads.single('image'), createCar);
 
-carRouter.put('/:id', uploads.single('image'), updateCar);
+// carRouter.put('/:id', uploads.single('image'), updateCar);
+carRouter.post('/', uploads.array('images', 8), createCar);
+carRouter.put('/:id', uploads.array('images', 8), updateCar);
 carRouter.delete('/:id', deleteCar);
 
 export default carRouter;

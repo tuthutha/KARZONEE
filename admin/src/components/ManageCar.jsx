@@ -34,8 +34,35 @@ const sanitizeImageForBackend = (img) => {
 };
 
 // STORE IN DB
+// const buildSafeCar = (raw = {}, idx = 0) => {
+//     const _id = raw._id || raw.id || null;
+//     return {
+//         _id,
+//         id: _id || raw.id || raw.localId || `local-${idx + 1}`,
+//         make: raw.make || "",
+//         model: raw.model || "",
+//         year: raw.year ?? "",
+//         category: raw.category || "Sedan",
+//         seats: raw.seats ?? 4,
+//         transmission: raw.transmission || "Automatic",
+//         fuelType: raw.fuelType || raw.fuel || "Gasoline",
+//         mileage: raw.mileage ?? 0,
+//         dailyRate: raw.dailyRate ?? raw.price ?? 0,
+//         status: raw.status || "available",
+//         _rawImage: raw.image ?? raw._rawImage ?? "",
+//         image: raw.image
+//             ? makeImageUrl(raw.image)
+//             : raw._rawImage
+//                 ? makeImageUrl(raw._rawImage)
+//                 : "",
+//     };
+// };
+
 const buildSafeCar = (raw = {}, idx = 0) => {
     const _id = raw._id || raw.id || null;
+    const images = Array.isArray(raw.images) ? raw.images : [];
+    const primary = raw.image || images[0] || "";
+
     return {
         _id,
         id: _id || raw.id || raw.localId || `local-${idx + 1}`,
@@ -49,12 +76,9 @@ const buildSafeCar = (raw = {}, idx = 0) => {
         mileage: raw.mileage ?? 0,
         dailyRate: raw.dailyRate ?? raw.price ?? 0,
         status: raw.status || "available",
-        _rawImage: raw.image ?? raw._rawImage ?? "",
-        image: raw.image
-            ? makeImageUrl(raw.image)
-            : raw._rawImage
-                ? makeImageUrl(raw._rawImage)
-                : "",
+        images,
+        _rawImage: primary,
+        image: primary ? makeImageUrl(primary) : "",
     };
 };
 

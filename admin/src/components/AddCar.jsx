@@ -19,8 +19,10 @@ const AddCar = () => {
         model: "",
         description: "",
         category: "Sedan",
-        image: null,
-        imagePreview: null,
+        // image: null,
+        // imagePreview: null,
+        images: [],
+        imagePreviews: [],
     };
 
     const [data, setData] = useState(initialFormData);
@@ -32,25 +34,69 @@ const AddCar = () => {
     }, []);
 
     // FOR IMG HANDLING
+    // const handleImageChange = useCallback((e) => {
+    //     const file = e.target.files?.[0];
+    //     if (!file) return;
+
+    //     const reader = new FileReader();
+    //     reader.onload = (evt) =>
+    //         setData((prev) => ({
+    //             ...prev,
+    //             image: file,
+    //             imagePreview: evt.target.result,
+    //         }));
+
+    //     reader.readAsDataURL(file);
+    // }, []);
+
+    // const handleImageChange = useCallback((e) => {
+    //     const files = Array.from(e.target.files || []).slice(0, 8);
+    //     if (!files.length) return;
+
+    //     const previews = files.map((file) => URL.createObjectURL(file));
+
+    //     setData((prev) => ({
+    //         ...prev,
+    //         images: files,
+    //         imagePreviews: previews,
+    //     }));
+    // }, []);
+
     const handleImageChange = useCallback((e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const newFiles = Array.from(e.target.files || []);
+        if (!newFiles.length) return;
 
-        const reader = new FileReader();
-        reader.onload = (evt) =>
-            setData((prev) => ({
+        setData((prev) => {
+            const currentImages = Array.isArray(prev.images) ? prev.images : [];
+            const currentPreviews = Array.isArray(prev.imagePreviews) ? prev.imagePreviews : [];
+
+            const remainingSlots = 8 - currentImages.length;
+            if (remainingSlots <= 0) return prev;
+
+            const filesToAdd = newFiles.slice(0, remainingSlots);
+            const previewsToAdd = filesToAdd.map((file) => URL.createObjectURL(file));
+
+            return {
                 ...prev,
-                image: file,
-                imagePreview: evt.target.result,
-            }));
+                images: [...currentImages, ...filesToAdd],
+                imagePreviews: [...currentPreviews, ...previewsToAdd],
+            };
+        });
 
-        reader.readAsDataURL(file);
+        if (fileRef.current) {
+            fileRef.current.value = "";
+        }
     }, []);
+
+    // const resetForm = useCallback(() => {
+    //     setData(initialFormData);
+    //     if (fileRef.current) fileRef.current.value = "";
+    // }, [initialFormData]);
 
     const resetForm = useCallback(() => {
         setData(initialFormData);
         if (fileRef.current) fileRef.current.value = "";
-    }, [initialFormData]);
+    }, []);
 
     const showToast = useCallback((type, title, message, icon) => {
         const toastConfig = {
@@ -108,7 +154,10 @@ const AddCar = () => {
                 formData.append(key, value);
             });
 
-            if (data.image) formData.append("image", data.image);
+            // if (data.image) formData.append("image", data.image);
+            data.images.forEach((file) => {
+                formData.append("images", file);
+            });
 
             await api.post("/api/cars", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -415,8 +464,8 @@ const AddCar = () => {
 
                             <div>
                                 <label className={AddCarPageStyles.label}>Hình ảnh xe</label>
-                                <div className={AddCarPageStyles.imageUploadContainer}>
-                                    <label className={AddCarPageStyles.imageUploadLabel}>
+                                <div className={`${AddCarPageStyles.imageUploadContainer} flex flex-col`}>
+                                    <label className={`${AddCarPageStyles.imageUploadLabel} w-full`}>
                                         {data.imagePreview ? (
                                             <div className="w-full h-full rounded-xl overflow-hidden">
                                                 <img
@@ -442,26 +491,67 @@ const AddCar = () => {
                                                 </svg>
                                                 <p className={AddCarPageStyles.imageUploadText}>
                                                     <span className={AddCarPageStyles.imageUploadTextSemibold}>
-                                                        Click to upload
+                                                        Nhấn để tải ảnh lên
                                                     </span>
                                                     <br />
-                                                    or drag and drop
+                                                    hoặc kéo và thả vào đây
                                                 </p>
 
                                                 <p className={AddCarPageStyles.imageUploadSubText}>
-                                                    PNG, JPG upto 5mb
+                                                    PNG, JPG tối đa 5MB
                                                 </p>
                                             </div>
                                         )}
-                                        <input
+                                        {/* <input
                                             type="file"
                                             ref={fileRef}
                                             name="image"
                                             onChange={handleImageChange}
                                             className="hidden"
                                             accept="image/*"
+                                        /> */}
+                                        <input
+                                            ref={fileRef}
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleImageChange}
+                                            className="hidden border-radius"
                                         />
+
+                                        {/* {data.imagePreviews.length > 0 && (
+                                            <div className="mt-4 grid grid-cols-4 gap-3">
+                                                {data.imagePreviews.slice(0, 8).map((src, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-slate-800"
+                                                    >
+                                                        <img
+                                                            src={src}
+                                                            alt={`preview-${index + 1}`}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )} */}
                                     </label>
+                                    {data.imagePreviews.length > 0 && (
+                                        <div className="mt-4 grid grid-cols-4 gap-3">
+                                            {data.imagePreviews.slice(0, 8).map((src, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-slate-800"
+                                                >
+                                                    <img
+                                                        src={src}
+                                                        alt={`preview-${index + 1}`}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

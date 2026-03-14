@@ -25,10 +25,16 @@ export const createCar = async (req, res, next) => {
       });
     }
 
-    let imageFilename = req.body.image || '';
-    if (req.file) {
-      imageFilename = req.file.filename;
-    }
+    // let imageFilename = req.body.image || '';
+    // if (req.file) {
+    //   imageFilename = req.file.filename;
+    // }
+
+    const uploadedImages = Array.isArray(req.files)
+      ? req.files.map((file) => file.filename)
+      : [];
+
+    const primaryImage = uploadedImages[0] || '';
 
     // SAVING TO DB
     const car = new Car({
@@ -43,8 +49,10 @@ export const createCar = async (req, res, next) => {
       mileage: mileage ? Number(mileage) : 0,
       dailyRate: Number(dailyRate),
       status: status || 'available',
-      image: imageFilename || '',
+      // image: imageFilename || '',
       description: description || '',
+      image: primaryImage,
+      images: uploadedImages,
     });
 
     const saved = await car.save();
@@ -117,22 +125,43 @@ export const updateCar = async (req, res, next) => {
     const car = await Car.findById(req.params.id);
     if (!car) return res.status(404).json({ message: 'Car not found' });
 
-    if (req.file) {
-      if (car.image) {
-        const oldPath = path.join(process.cwd(), 'uploads', car.image);
+    // if (req.file) {
+    //   if (car.image) {
+    //     const oldPath = path.join(process.cwd(), 'uploads', car.image);
+    //     fs.unlink(oldPath, (err) => {
+    //       if (err) console.warn('Failed to delete old image:', err);
+    //     });
+    //   }
+    //   car.image = req.file.filename;
+    // } else if (req.body.image !== undefined) {
+    //   if (!req.body.image && car.image) {
+    //     const oldPath = path.join(process.cwd(), 'uploads', car.image);
+    //     fs.unlink(oldPath, (err) => {
+    //       if (err) console.warn('Failed to delete old image:', err);
+    //     });
+    //     car.image = '';
+    //   }
+    // }
+
+    const uploadedImages = Array.isArray(req.files)
+      ? req.files.map((file) => file.filename)
+      : [];
+
+    if (uploadedImages.length > 0) {
+      const oldImages = Array.isArray(car.images) ? car.images : [];
+      const fallbackOldImages = car.image ? [car.image] : [];
+      const imagesToDelete =
+        oldImages.length > 0 ? oldImages : fallbackOldImages;
+
+      imagesToDelete.forEach((img) => {
+        const oldPath = path.join(process.cwd(), 'uploads', img);
         fs.unlink(oldPath, (err) => {
           if (err) console.warn('Failed to delete old image:', err);
         });
-      }
-      car.image = req.file.filename;
-    } else if (req.body.image !== undefined) {
-      if (!req.body.image && car.image) {
-        const oldPath = path.join(process.cwd(), 'uploads', car.image);
-        fs.unlink(oldPath, (err) => {
-          if (err) console.warn('Failed to delete old image:', err);
-        });
-        car.image = '';
-      }
+      });
+
+      car.image = uploadedImages[0];
+      car.images = uploadedImages;
     }
 
     const fields = [

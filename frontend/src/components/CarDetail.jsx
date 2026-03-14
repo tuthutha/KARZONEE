@@ -15,6 +15,7 @@ import {
   FaCity,
   FaGlobeAsia,
   FaMapPin,
+  FaImages
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -75,6 +76,7 @@ const CarDetail = () => {
   const [loadingCar, setLoadingCar] = useState(false);
   const [carError, setCarError] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
+  const [showGallery, setShowGallery] = useState(false);
   // const [formData, setFormData] = useState({
   //   pickupDate: "",
   //   returnDate: "",
@@ -163,10 +165,16 @@ const CarDetail = () => {
     return <div className="p-6 text-red-400">{carError}</div>;
   if (!car) return <div className="p-6 text-white">Car not found.</div>;
 
-  const carImages = [
-    ...(Array.isArray(car.images) ? car.images : []),
-    ...(car.image ? (Array.isArray(car.image) ? car.image : [car.image]) : []),
-  ].filter(Boolean);
+  // const carImages = [
+  //   ...(Array.isArray(car.images) ? car.images : []),
+  //   ...(car.image ? (Array.isArray(car.image) ? car.image : [car.image]) : []),
+  // ].filter(Boolean);
+
+  const carImages = Array.isArray(car.images) && car.images.length > 0
+    ? car.images
+    : car.image
+      ? [car.image]
+      : [];
 
   const price = Number(car.price ?? car.dailyRate ?? 0) || 0;
   const days = calculateDays(formData.pickupDate, formData.returnDate);
@@ -378,14 +386,28 @@ const CarDetail = () => {
 
         <div className={carDetailStyles.mainLayout}>
           <div className={carDetailStyles.leftColumn}>
-            <div className={carDetailStyles.imageCarousel}>
+            {/* <div className={carDetailStyles.imageCarousel}> */}
+            <div className={`${carDetailStyles.imageCarousel} relative`}>
               <img
-                src={buildImageSrc(carImages[currentImage] ?? car.image)}
+                // src={buildImageSrc(carImages[currentImage] ?? car.image)}
+                src={buildImageSrc(carImages[currentImage] || car.image)}
                 alt={car.name}
                 className={carDetailStyles.carImage}
                 onError={(e) => handleImageError(e)}
               />
-              {(carImages.length > 0 || (car.image && car.image !== "")) && (
+
+              {carImages.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setShowGallery(true)}
+                  className="absolute bottom-4 right-4 rounded-2xl bg-white px-4 py-2 text-black font-semibold shadow-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <FaImages />
+                  Xem tất cả ảnh
+                </button>
+              )}
+
+              {/* {(carImages.length > 0 || (car.image && car.image !== "")) && (
                 <div className={carDetailStyles.carouselIndicators}>
                   {(carImages.length > 0 ? carImages : [car.image]).map(
                     (_, idx) => (
@@ -400,7 +422,7 @@ const CarDetail = () => {
                     )
                   )}
                 </div>
-              )}
+              )} */}
             </div>
 
             <h1 className={carDetailStyles.carName}>{car.make}</h1>
@@ -455,40 +477,43 @@ const CarDetail = () => {
             </div>
 
             <div className={carDetailStyles.aboutSection}>
-              <h2 className={carDetailStyles.aboutTitle}>About this car</h2>
-              <p className={carDetailStyles.aboutText}>
+              <h2 className={carDetailStyles.aboutTitle}>Thông tin xe</h2>
+              {/* <p className={carDetailStyles.aboutText}>
                 Experience luxury in the {car.name}. With its{" "}
                 {transmissionLabel} transmission and seating for{" "}
                 {car.seats ?? "—"}, every journey is exceptional.
-              </p>
-              <p className={carDetailStyles.aboutText}>
+              </p> */}
+              {/* <p className={carDetailStyles.aboutText}>
                 {car.description ??
                   "This car combines performance and comfort for an unforgettable drive."}
+              </p> */}
+              <p className={carDetailStyles.aboutText}>
+                {car.description?.trim() || "Chưa có mô tả cho xe này."}
               </p>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="flex items-center">
                   <FaCheckCircle className="text-green-400 mr-2 text-sm" />
                   <span className="text-gray-300 text-sm">
-                    Free cancellation
+                    Hủy miễn phí
                   </span>
                 </div>
                 <div className="flex items-center">
                   <FaCheckCircle className="text-green-400 mr-2 text-sm" />
                   <span className="text-gray-300 text-sm">
-                    24/7 Roadside assistance
+                    Hỗ trợ cứu hộ 24/7
                   </span>
                 </div>
                 <div className="flex items-center">
                   <FaCheckCircle className="text-green-400 mr-2 text-sm" />
                   <span className="text-gray-300 text-sm">
-                    Unlimited mileage
+                    Không giới hạn quãng đường
                   </span>
                 </div>
                 <div className="flex items-center">
                   <FaCheckCircle className="text-green-400 mr-2 text-sm" />
                   <span className="text-gray-300 text-sm">
-                    Collision damage waiver
+                    Miễn trừ thiệt hại va chạm (CDW)
                   </span>
                 </div>
               </div>
@@ -788,7 +813,7 @@ const CarDetail = () => {
                       className="mt-1"
                     />
                     <span>
-                      Bằng việc đặt xe, bạn đồng ý với các <b>Điều khoản &amp; Điều kiện</b>
+                      Bằng việc đặt xe, bạn đồng ý với các <b>Điều khoản &amp; Điều kiện</b> của chúng tôi
                     </span>
                   </label>
                 </div>
@@ -814,6 +839,76 @@ const CarDetail = () => {
           </div>
         </div>
       </div>
+
+      {showGallery && carImages.length > 0 && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 text-white">
+            <div className="text-lg font-semibold">
+              {currentImage + 1} / {carImages.length}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowGallery(false)}
+              className="text-3xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center px-6">
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentImage((prev) =>
+                  prev === 0 ? carImages.length - 1 : prev - 1
+                )
+              }
+              className="mr-4 text-white text-4xl"
+            >
+              ‹
+            </button>
+
+            <img
+              src={buildImageSrc(carImages[currentImage])}
+              alt={`car-${currentImage + 1}`}
+              className="max-h-[80vh] max-w-[80vw] object-contain"
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentImage((prev) =>
+                  prev === carImages.length - 1 ? 0 : prev + 1
+                )
+              }
+              className="ml-4 text-white text-4xl"
+            >
+              ›
+            </button>
+          </div>
+
+          <div className="px-6 pb-6">
+            <div className="flex gap-3 overflow-x-auto">
+              {carImages.map((img, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setCurrentImage(index)}
+                  className={`h-20 w-28 shrink-0 overflow-hidden rounded-lg border ${currentImage === index ? "border-orange-500" : "border-white/20"
+                    }`}
+                >
+                  <img
+                    src={buildImageSrc(img)}
+                    alt={`thumb-${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

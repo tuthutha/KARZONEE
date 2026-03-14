@@ -33,6 +33,8 @@ const carSchema = new Schema({
     default: 'available',
   },
   image: { type: String, default: '' },
+  images: [{ type: String }],
+  description: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 
   bookings: { type: [carBookingSubSchema], default: [] }, //show the id that has booked the car
