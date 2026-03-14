@@ -28,9 +28,16 @@ const Cars = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [seatFilter, setSeatFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [sortPrice, setSortPrice] = useState("default");
+
   const abortControllerRef = useRef(null);
   const base = "http://localhost:5000";
-  const limit = 12;
+  // const limit = 12;
+  const limit = 100;
   const fallbackImage = `${base}/uploads/default-car.png`;
 
   useEffect(() => {
@@ -51,14 +58,14 @@ const Cars = () => {
     if (abortControllerRef.current) {
       try {
         abortControllerRef.current.abort();
-      } catch (e) {}
+      } catch (e) { }
     }
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
     try {
       const res = await axios.get(`${base}/api/cars`, {
-        params: { limit },
+        // params: { limit },
         signal: controller.signal,
         headers: { Accept: "application/json" },
       });
@@ -314,6 +321,86 @@ const Cars = () => {
     navigate(`/cars/${id}`, { state: { car } });
   };
 
+  const seatOptions = Array.from(
+    new Set(
+      cars
+        .map((car) => String(car.seats ?? "").trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => Number(a) - Number(b));
+
+  const categoryOptions = Array.from(
+    new Set(
+      cars
+        .map((car) => String(car.category ?? car.type ?? "").trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b));
+
+  // const filteredCars = [...cars]
+  //   .filter((car) => {
+  //     const carName = `${car.make || car.name || ""} ${car.model || ""}`.trim().toLowerCase();
+  //     const matchesSearch =
+  //       !searchTerm.trim() || carName.includes(searchTerm.trim().toLowerCase());
+
+  //     const matchesSeats =
+  //       seatFilter === "all" || String(car.seats ?? "") === String(seatFilter);
+
+  //     const matchesCategory =
+  //       categoryFilter === "all" ||
+  //       String(car.category ?? car.type ?? "").toLowerCase() === categoryFilter.toLowerCase();
+
+  //     const effective = computeEffectiveAvailability(car);
+  //     const isAvailable = !isBookDisabled(car);
+
+  //     const matchesAvailability =
+  //       availabilityFilter === "all" ||
+  //       (availabilityFilter === "available" && isAvailable) ||
+  //       (availabilityFilter === "unavailable" && !isAvailable);
+
+  //     return matchesSearch && matchesSeats && matchesCategory && matchesAvailability;
+  //   })
+  //   .sort((a, b) => {
+  //     const priceA = Number(a.dailyRate ?? a.price ?? a.pricePerDay ?? 0);
+  //     const priceB = Number(b.dailyRate ?? b.price ?? b.pricePerDay ?? 0);
+
+  //     if (sortPrice === "lowToHigh") return priceA - priceB;
+  //     if (sortPrice === "highToLow") return priceB - priceA;
+  //     return 0;
+  //   });
+
+  const filteredCars = [...cars]
+    .filter((car) => {
+      const carName = `${car.make || car.name || ""} ${car.model || ""}`.trim().toLowerCase();
+
+      const matchesSearch =
+        !searchTerm.trim() || carName.includes(searchTerm.trim().toLowerCase());
+
+      const matchesSeats =
+        seatFilter === "all" || String(car.seats ?? "") === String(seatFilter);
+
+      const matchesCategory =
+        categoryFilter === "all" ||
+        String(car.category ?? car.type ?? "").trim().toLowerCase() === categoryFilter.toLowerCase();
+
+      const isAvailable = !isBookDisabled(car);
+
+      const matchesAvailability =
+        availabilityFilter === "all" ||
+        (availabilityFilter === "available" && isAvailable) ||
+        (availabilityFilter === "unavailable" && !isAvailable);
+
+      return matchesSearch && matchesSeats && matchesCategory && matchesAvailability;
+    })
+    .sort((a, b) => {
+      const priceA = Number(a.dailyRate ?? a.price ?? a.pricePerDay ?? 0);
+      const priceB = Number(b.dailyRate ?? b.price ?? b.pricePerDay ?? 0);
+
+      if (sortPrice === "lowToHigh") return priceA - priceB;
+      if (sortPrice === "highToLow") return priceB - priceA;
+      return 0;
+    });
+
   return (
     <div className={carPageStyles.pageContainer}>
       {/* Main Content */}
@@ -324,6 +411,91 @@ const Cars = () => {
           <p className={carPageStyles.subtitle}>
             Khám phá các mẫu xe cho thuê với nhiều lựa chọn khác nhau, luôn sẵn sàng phục vụ cho chuyến đi của bạn.
           </p>
+        </div>
+
+        {/* <div className="w-full max-w-5xl mx-auto mb-8"> */}
+        {/* <div className="mb-4">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm theo tên xe..."
+              className="w-full rounded-2xl border border-white/10 bg-slate-800/80 px-5 py-4 text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div> */}
+
+        <div className="w-full max-w-5xl mx-auto mb-8">
+          <div className="mb-4">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm theo tên xe..."
+              className="w-full rounded-2xl border border-white/10 bg-slate-800/80 px-5 py-4 text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <select
+              value={sortPrice}
+              onChange={(e) => setSortPrice(e.target.value)}
+              className="rounded-2xl border border-white/10 bg-slate-800 px-4 py-4 text-white outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="default">Sắp xếp giá</option>
+              <option value="lowToHigh">Giá từ thấp đến cao</option>
+              <option value="highToLow">Giá từ cao đến thấp</option>
+            </select>
+
+            <select
+              value={seatFilter}
+              onChange={(e) => setSeatFilter(e.target.value)}
+              className="rounded-2xl border border-white/10 bg-slate-800 px-4 py-4 text-white outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="all">Tất cả số chỗ</option>
+              {seatOptions.map((seat) => (
+                <option key={seat} value={seat}>
+                  {seat} chỗ
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="rounded-2xl border border-white/10 bg-slate-800 px-4 py-4 text-white outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="all">Tất cả loại xe</option>
+              {categoryOptions.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={availabilityFilter}
+              onChange={(e) => setAvailabilityFilter(e.target.value)}
+              className="rounded-2xl border border-white/10 bg-slate-800 px-4 py-4 text-white outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value="available">Book được</option>
+              <option value="unavailable">Không book được</option>
+            </select>
+          </div>
+          {/* </div> */}
+
+          {/* <div className="flex flex-wrap gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => setAvailabilityFilter("unavailable")}
+              className={`px-6 py-3 rounded-full font-semibold transition ${availabilityFilter === "unavailable"
+                ? "bg-orange-500 text-white"
+                : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                }`}
+            >
+              Không book được
+            </button>
+          </div> */}
         </div>
 
         {/* Grid */}
@@ -354,106 +526,111 @@ const Cars = () => {
             </div>
           )}
 
-          {!loading && !error && cars.length === 0 && (
+          {/* {!loading && !error && cars.length === 0 && (
             <div className="col-span-full text-center">No cars available.</div>
+          )} */}
+          {!loading && !error && filteredCars.length === 0 && (
+            <div className="text-center text-slate-300 py-10">
+              Không tìm thấy xe phù hợp.
+            </div>
           )}
 
-          {!loading &&
-            cars.map((car, idx) => {
-              const id = car._id ?? car.id ?? idx;
-              const carName =
-                `${car.make || car.name || ""} ${car.model || ""}`.trim() ||
-                car.name ||
-                "Unnamed";
-              const imageSrc = buildImageSrc(car.image) || fallbackImage;
-              const disabled = isBookDisabled(car);
+          {/* {!loading &&
+            cars.map((car, idx) => { */}
+          {!loading && filteredCars.map((car, idx) => {
+            const id = car._id ?? car.id ?? idx;
+            const carName =
+              `${car.make || car.name || ""} ${car.model || ""}`.trim() ||
+              car.name ||
+              "Unnamed";
+            const imageSrc = buildImageSrc(car.image) || fallbackImage;
+            const disabled = isBookDisabled(car);
 
-              return (
-                <div key={id} className={carPageStyles.carCard}>
-                  <div className={carPageStyles.glowEffect}></div>
+            return (
+              <div key={id} className={carPageStyles.carCard}>
+                <div className={carPageStyles.glowEffect}></div>
 
-                  <div className={carPageStyles.imageContainer}>
-                    <div className="absolute inset-0 z-10" />
-                    <img
-                      src={imageSrc}
-                      alt={carName}
-                      onError={handleImageError}
-                      className={carPageStyles.carImage}
-                    />
+                <div className={carPageStyles.imageContainer}>
+                  <div className="absolute inset-0 z-10" />
+                  <img
+                    src={imageSrc}
+                    alt={carName}
+                    onError={handleImageError}
+                    className={carPageStyles.carImage}
+                  />
 
-                    {/* availability badge at top-right of card */}
-                    <div className="absolute right-4 top-4 z-20">
-                      {renderAvailabilityBadge(car.availability, car)}
-                    </div>
-
-                    <div className={carPageStyles.priceBadge}>
-                      ₹{car.dailyRate ?? car.price ?? car.pricePerDay ?? "—"}
-                      /day
-                    </div>
+                  {/* availability badge at top-right of card */}
+                  <div className="absolute right-4 top-4 z-20">
+                    {renderAvailabilityBadge(car.availability, car)}
                   </div>
 
-                  <div className={carPageStyles.cardContent}>
-                    <div className={carPageStyles.headerRow}>
-                      <div>
-                        <h3 className={carPageStyles.carName}>{carName}</h3>
-                        <p className={carPageStyles.carType}>
-                          {car.category ?? car.type ?? "Sedan"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className={carPageStyles.specsGrid}>
-                      <div className={carPageStyles.specItem}>
-                        <div className={carPageStyles.specIconContainer}>
-                          <FaUserFriends className="text-sky-400" />
-                        </div>
-                        <span>{car.seats ?? "4"} Seats</span>
-                      </div>
-
-                      <div className={carPageStyles.specItem}>
-                        <div className={carPageStyles.specIconContainer}>
-                          <FaGasPump className="text-amber-400" />
-                        </div>
-                        <span>{car.fuelType ?? car.fuel ?? "Gasoline"}</span>
-                      </div>
-
-                      <div className={carPageStyles.specItem}>
-                        <div className={carPageStyles.specIconContainer}>
-                          <FaTachometerAlt className="text-emerald-400" />
-                        </div>
-                        <span>{car.mileage ? `${car.mileage} kmpl` : "—"}</span>
-                      </div>
-
-                      <div className={carPageStyles.specItem}>
-                        <div className={carPageStyles.specIconContainer}>
-                          <FaShieldAlt className="text-purple-400" />
-                        </div>
-                        <span>Premium</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleBook(car, id)}
-                      className={`${carPageStyles.bookButton} ${
-                        disabled ? "opacity-60 cursor-not-allowed" : ""
-                      }`}
-                      aria-label={`Book ${carName}`}
-                      title={
-                        disabled
-                          ? "Xe này hiện đang được đặt hoặc không khả dụng."
-                          : `Book ${carName}`
-                      }
-                      disabled={disabled}
-                    >
-                      <span className={carPageStyles.buttonText}>
-                        {disabled ? "Unavailable" : "Book Now"}
-                      </span>
-                      <FaArrowRight className={carPageStyles.buttonIcon} />
-                    </button>
+                  <div className={carPageStyles.priceBadge}>
+                    ₹{car.dailyRate ?? car.price ?? car.pricePerDay ?? "—"}
+                    /day
                   </div>
                 </div>
-              );
-            })}
+
+                <div className={carPageStyles.cardContent}>
+                  <div className={carPageStyles.headerRow}>
+                    <div>
+                      <h3 className={carPageStyles.carName}>{carName}</h3>
+                      <p className={carPageStyles.carType}>
+                        {car.category ?? car.type ?? "Sedan"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={carPageStyles.specsGrid}>
+                    <div className={carPageStyles.specItem}>
+                      <div className={carPageStyles.specIconContainer}>
+                        <FaUserFriends className="text-sky-400" />
+                      </div>
+                      <span>{car.seats ?? "4"} Seats</span>
+                    </div>
+
+                    <div className={carPageStyles.specItem}>
+                      <div className={carPageStyles.specIconContainer}>
+                        <FaGasPump className="text-amber-400" />
+                      </div>
+                      <span>{car.fuelType ?? car.fuel ?? "Gasoline"}</span>
+                    </div>
+
+                    <div className={carPageStyles.specItem}>
+                      <div className={carPageStyles.specIconContainer}>
+                        <FaTachometerAlt className="text-emerald-400" />
+                      </div>
+                      <span>{car.mileage ? `${car.mileage} kmpl` : "—"}</span>
+                    </div>
+
+                    <div className={carPageStyles.specItem}>
+                      <div className={carPageStyles.specIconContainer}>
+                        <FaShieldAlt className="text-purple-400" />
+                      </div>
+                      <span>Premium</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleBook(car, id)}
+                    className={`${carPageStyles.bookButton} ${disabled ? "opacity-60 cursor-not-allowed" : ""
+                      }`}
+                    aria-label={`Book ${carName}`}
+                    title={
+                      disabled
+                        ? "Xe này hiện đang được đặt hoặc không khả dụng."
+                        : `Book ${carName}`
+                    }
+                    disabled={disabled}
+                  >
+                    <span className={carPageStyles.buttonText}>
+                      {disabled ? "Unavailable" : "Book Now"}
+                    </span>
+                    <FaArrowRight className={carPageStyles.buttonIcon} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Floating decorative elements */}
