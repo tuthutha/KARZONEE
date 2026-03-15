@@ -28,7 +28,9 @@ const HomeCars = () => {
     baseURL: base,
     headers: { Accept: "application/json" },
   });
-  const limit = 6;
+  // const limit = 6;
+  const fetchLimit = 0;
+  const homeDisplayLimit = 9;
   const fallbackImage = `${base}/uploads/default-car.png`;
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const HomeCars = () => {
       clearTimeout(t);
       try {
         abortRef.current?.abort();
-      } catch {}
+      } catch { }
     };
   }, []);
 
@@ -47,15 +49,21 @@ const HomeCars = () => {
     setError("");
     try {
       abortRef.current?.abort();
-    } catch {}
+    } catch { }
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
+      // const res = await api.get("/api/cars", {
+      //   params: { limit },
+      //   signal: ctrl.signal,
+      // });
+      // setCars(res.data?.data || []);
       const res = await api.get("/api/cars", {
-        params: { limit },
+        params: { limit: fetchLimit },
         signal: ctrl.signal,
       });
-      setCars(res.data?.data || []);
+
+      setCars(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch (err) {
       const isCanceled =
         err?.code === "ERR_CANCELED" ||
@@ -279,6 +287,15 @@ const HomeCars = () => {
     navigate(`/cars/${car._id || car.id}`, { state: { car } });
   };
 
+  const visibleCars = [...cars]
+    .filter((car) => !isBookDisabled(car))
+    .sort((a, b) => {
+      const dateA = new Date(a?.createdAt || 0).getTime();
+      const dateB = new Date(b?.createdAt || 0).getTime();
+      return dateB - dateA;
+    })
+    .slice(0, homeDisplayLimit);
+
   return (
     <div className={styles.container}>
       <div className={styles.headerContainer}>
@@ -298,14 +315,14 @@ const HomeCars = () => {
 
       <div className={styles.grid}>
         {loading &&
-          Array.from({ length: limit }).map((_, idx) => (
+          // Array.from({ length: limit }).map((_, idx) => (
+          Array.from({ length: homeDisplayLimit }).map((_, idx) => (
             <div
               key={`s-${idx}`}
-              className={`${styles.card} border ${
-                styles.borderGradients?.[
-                  idx % (styles.borderGradients?.length || 1)
-                ] || ""
-              } opacity-50 animate-pulse`}
+              className={`${styles.card} border ${styles.borderGradients?.[
+                idx % (styles.borderGradients?.length || 1)
+              ] || ""
+                } opacity-50 animate-pulse`}
               style={{
                 clipPath:
                   "polygon(0% 15%, 15% 0%, 100% 0%, 100% 85%, 85% 100%, 0% 100%)",
@@ -333,12 +350,20 @@ const HomeCars = () => {
         {!loading && error && (
           <div className="col-span-full text-center text-red-600">{error}</div>
         )}
-        {!loading && !error && cars.length === 0 && (
+        {/* {!loading && !error && cars.length === 0 && (
           <div className="col-span-full text-center">No cars found.</div>
+        )} */}
+
+        {!loading && !error && visibleCars.length === 0 && (
+          <div className="col-span-full text-center text-slate-300">
+            Không có xe nào đang sẵn sàng để đặt.
+          </div>
         )}
 
+        {/* {!loading &&
+          cars.map((car, idx) => { */}
         {!loading &&
-          cars.map((car, idx) => {
+          visibleCars.map((car, idx) => {
             const carName =
               `${car.make || ""} ${car.model || ""}`.trim() ||
               car.name ||
@@ -457,11 +482,10 @@ const HomeCars = () => {
 
                   <button
                     onClick={() => handleBook(car)}
-                    className={`${styles.bookButton} ${
-                      disabled
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:shadow-md"
-                    }`}
+                    className={`${styles.bookButton} ${disabled
+                      ? "opacity-60 cursor-not-allowed"
+                      : "hover:shadow-md"
+                      }`}
                     disabled={disabled}
                     aria-disabled={disabled}
                     title={
@@ -482,6 +506,18 @@ const HomeCars = () => {
             );
           })}
       </div>
+
+      {!loading && !error && visibleCars.length > 0 && (
+        <div className="flex justify-center mt-10">
+          <button
+            type="button"
+            onClick={() => navigate("/cars")}
+            className="px-8 py-3 rounded-full bg-orange-500 text-white font-semibold hover:bg-orange-600 transition cursor-pointer"
+          >
+            Xem tất cả xe
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -65,8 +65,11 @@ export const createCar = async (req, res, next) => {
 // GET FUNCTION TO FETCH CAR
 export const getCars = async (req, res, next) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 12;
+    // const page = Number(req.query.page) || 1;
+    // const limit = Number(req.query.limit) || 12;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const hasLimitQuery = req.query.limit !== undefined;
+    const limit = hasLimitQuery ? Number(req.query.limit) : 12;
     const search = req.query.search || '';
     const category = req.query.category || '';
     const status = req.query.status || '';
@@ -83,11 +86,20 @@ export const getCars = async (req, res, next) => {
     if (category) query.category = category;
     if (status) query.status = status;
 
+    // const total = await Car.countDocuments(query);
+    // const cars = await Car.find(query)
+    //   .sort({ createdAt: -1 })
+    //   .skip((page - 1) * limit)
+    //   .limit(limit);
     const total = await Car.countDocuments(query);
-    const cars = await Car.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+
+    let carsQuery = Car.find(query).sort({ createdAt: -1 });
+
+    if (limit > 0) {
+      carsQuery = carsQuery.skip((page - 1) * limit).limit(limit);
+    }
+
+    const cars = await carsQuery;
 
     const carsWithAvailability = cars.map((c) => {
       const plain = c.toObject ? c.toObject() : c;
@@ -95,9 +107,15 @@ export const getCars = async (req, res, next) => {
       return plain;
     });
 
+    // res.json({
+    //   page,
+    //   pages: Math.ceil(total / limit),
+    //   total,
+    //   data: carsWithAvailability,
+    // });
     res.json({
       page,
-      pages: Math.ceil(total / limit),
+      pages: limit > 0 ? Math.ceil(total / limit) : 1,
       total,
       data: carsWithAvailability,
     });
