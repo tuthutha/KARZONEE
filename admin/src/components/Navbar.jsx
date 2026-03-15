@@ -2,7 +2,15 @@ import React, { useRef, useState, useEffect } from "react";
 import { navbarStyles as s } from "../assets/dummyStyles";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logocar.png";
-import { CalendarCheck, Car, PlusCircle, Menu, X, LogOut, } from 'lucide-react';
+import {
+    CalendarCheck,
+    Car,
+    PlusCircle,
+    BarChart3,
+    Menu,
+    X,
+    LogOut,
+} from 'lucide-react';
 
 const ADMIN_STORAGE_KEY = "admin_authenticated";
 
@@ -10,7 +18,7 @@ const navLinks = [
     { path: "/", icon: PlusCircle, label: "Thêm xe" },
     { path: "/manage-cars", icon: Car, label: "Quản lý xe" },
     { path: "/bookings", icon: CalendarCheck, label: "Đơn đặt xe" },
-
+    { path: "/statistics", icon: BarChart3, label: "Thống kê" },
 ];
 
 const Navbar = () => {

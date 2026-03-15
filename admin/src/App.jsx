@@ -28,6 +28,7 @@ import AddCar from "./components/AddCar";
 import ManageCar from "./components/ManageCar";
 import Booking from "./components/Booking";
 import AdminLogin from "./components/AdminLogin";
+import Statistics from './components/Statistics';
 
 const ADMIN_STORAGE_KEY = "admin_authenticated";
 
@@ -101,6 +102,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Booking />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/statistics"
+          element={
+            <ProtectedRoute>
+              <Statistics />
             </ProtectedRoute>
           }
         />

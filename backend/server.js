@@ -12,6 +12,7 @@ import userRouter from './routes/userRoutes.js';
 import carRouter from './routes/carRoutes.js';
 import paymentRouter from './routes/paymentRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
 
 setServers(['1.1.1.1', '8.8.8.8']);
 
@@ -48,6 +49,7 @@ app.use('/api/auth', userRouter);
 app.use('/api/cars', carRouter);
 app.use('/api/bookings', bookingRouter);
 app.use('/api/payments', paymentRouter);
+app.use('/api/stats', statsRoutes);
 
 app.get('/api/ping', (req, res) =>
   res.json({
