@@ -701,7 +701,7 @@ const CarDetail = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex flex-col">
-                    <label className={carDetailStyles.formLabel}>City</label>
+                    <label className={carDetailStyles.formLabel}>Tỉnh / Thành phố</label>
                     <div
                       className={carDetailStyles.inputContainer(
                         activeField === "city"
@@ -713,7 +713,7 @@ const CarDetail = () => {
                       <input
                         type="text"
                         name="city"
-                        placeholder="Your city"
+                        placeholder="Nhập tỉnh / thành phố"
                         value={formData.city}
                         onChange={handleInputChange}
                         onFocus={() => setActiveField("city")}
@@ -725,7 +725,7 @@ const CarDetail = () => {
                   </div>
 
                   <div className="flex flex-col">
-                    <label className={carDetailStyles.formLabel}>State</label>
+                    <label className={carDetailStyles.formLabel}>Phường / Xã</label>
                     <div
                       className={carDetailStyles.inputContainer(
                         activeField === "state"
@@ -737,7 +737,7 @@ const CarDetail = () => {
                       <input
                         type="text"
                         name="state"
-                        placeholder="Your state"
+                        placeholder="Nhập phường / xã"
                         value={formData.state}
                         onChange={handleInputChange}
                         onFocus={() => setActiveField("state")}
@@ -750,7 +750,7 @@ const CarDetail = () => {
 
                   <div className="flex flex-col">
                     <label className={carDetailStyles.formLabel}>
-                      ZIP Code
+                      Địa chỉ chi tiết
                     </label>
                     <div
                       className={carDetailStyles.inputContainer(
@@ -763,7 +763,7 @@ const CarDetail = () => {
                       <input
                         type="text"
                         name="zipCode"
-                        placeholder="ZIP/Postal code"
+                        placeholder="Số nhà, tên đường, ngõ..."
                         value={formData.zipCode}
                         onChange={handleInputChange}
                         onFocus={() => setActiveField("zipCode")}

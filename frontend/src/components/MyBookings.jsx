@@ -69,6 +69,107 @@ const daysBetween = (start, end) => {
   }
 };
 
+// const normalizeBooking = (booking) => {
+//   const getCarData = () => {
+//     if (!booking) return {};
+//     if (typeof booking.car === "string") return { name: booking.car };
+//     if (booking.car && typeof booking.car === "object") {
+//       const snapshot = { ...booking.car };
+//       if (snapshot.id && typeof snapshot.id === "object") {
+//         const populated = { ...snapshot.id };
+//         delete snapshot.id;
+//         return { ...snapshot, ...populated };
+//       }
+//       return snapshot;
+//     }
+//     return {};
+//   };
+
+//   const carObj = getCarData();
+//   const details = booking.details || {};
+//   const address = booking.address || {};
+
+//   const image =
+//     safeAccess(() => booking.carImage) ||
+//     safeAccess(() => carObj.image) ||
+//     "https://via.placeholder.com/800x450.png?text=No+Image";
+
+//   const pickupDate =
+//     safeAccess(() => booking.pickupDate) ||
+//     safeAccess(() => booking.dates?.pickup) ||
+//     booking.pickup ||
+//     null;
+
+//   const returnDate =
+//     safeAccess(() => booking.returnDate) ||
+//     safeAccess(() => booking.dates?.return) ||
+//     booking.return ||
+//     null;
+
+//   const normalized = {
+//     id: booking._id || booking.id || String(Math.random()).slice(2, 8),
+//     car: {
+//       make: carObj.make || carObj.name || "Unnamed Car",
+//       image,
+//       year: carObj.year || carObj.modelYear || "",
+//       category: carObj.category,
+//       seats: details.seats || carObj.seats || 4,
+//       transmission:
+//         details.transmission || carObj.transmission || carObj.gearbox || "",
+//       fuelType:
+//         details.fuelType ||
+//         details.fuel ||
+//         carObj.fuelType ||
+//         carObj.fuel ||
+//         carObj.fuel_type ||
+//         "",
+//       mileage:
+//         details.mileage || carObj.mileage || carObj.kmpl || carObj.mpg || "",
+//     },
+//     user: {
+//       name: booking.customer || safeAccess(() => booking.user?.name) || "Guest",
+//       email: booking.email || safeAccess(() => booking.user?.email) || "",
+//       phone: booking.phone || safeAccess(() => booking.user?.phone) || "",
+//       address:
+//         address.street || address.city || address.state
+//           ? `${address.street || ""}${address.city ? ", " + address.city : ""}${address.state ? ", " + address.state : ""
+//           }`
+//           : safeAccess(() => booking.user?.address) || "",
+//     },
+//     dates: { pickup: pickupDate, return: returnDate },
+//     location:
+//       address.city || booking.location || carObj.location || "Pickup location",
+//     price: Number(booking.amount || booking.price || booking.total || 0),
+//     status:
+//       booking.status ||
+//       (booking.paymentStatus === "paid" ? "active" : "") ||
+//       (booking.paymentStatus === "pending" ? "pending" : "") ||
+//       "pending",
+//     bookingDate:
+//       booking.bookingDate ||
+//       booking.createdAt ||
+//       booking.updatedAt ||
+//       Date.now(),
+//     paymentMethod: booking.paymentMethod || booking.payment?.method || "",
+//     paymentId:
+//       booking.paymentIntentId || booking.paymentId || booking.sessionId || "",
+//     raw: booking,
+//   };
+
+//   // derive completed/upcoming from return date
+//   try {
+//     const now = new Date();
+//     const _return = new Date(normalized.dates.return);
+//     if (normalized.status === "active" || normalized.status === "pending") {
+//       normalized.status = _return > now ? "upcoming" : "completed";
+//     }
+//   } catch {
+//     normalized.status = normalized.status || "upcoming";
+//   }
+
+//   return normalized;
+// };
+
 const normalizeBooking = (booking) => {
   const getCarData = () => {
     if (!booking) return {};
@@ -106,6 +207,14 @@ const normalizeBooking = (booking) => {
     booking.return ||
     null;
 
+  const fullDeliveryAddress = [address.zipCode, address.state, address.city]
+    .filter(Boolean)
+    .join(", ");
+
+  const isPickupAtStore =
+    booking.pickupAtStore === true ||
+    details.pickupLocation === "Nhận xe tại cửa hàng";
+
   const normalized = {
     id: booking._id || booking.id || String(Math.random()).slice(2, 8),
     car: {
@@ -130,15 +239,14 @@ const normalizeBooking = (booking) => {
       name: booking.customer || safeAccess(() => booking.user?.name) || "Guest",
       email: booking.email || safeAccess(() => booking.user?.email) || "",
       phone: booking.phone || safeAccess(() => booking.user?.phone) || "",
-      address:
-        address.street || address.city || address.state
-          ? `${address.street || ""}${address.city ? ", " + address.city : ""}${address.state ? ", " + address.state : ""
-          }`
-          : safeAccess(() => booking.user?.address) || "",
+      address: fullDeliveryAddress,
     },
     dates: { pickup: pickupDate, return: returnDate },
-    location:
-      address.city || booking.location || carObj.location || "Pickup location",
+    location: isPickupAtStore
+      ? "Nhận xe tại cửa hàng"
+      : fullDeliveryAddress || details.pickupLocation || "Chưa có địa chỉ nhận xe",
+    pickupAtStore: isPickupAtStore,
+    pickupAddress: fullDeliveryAddress,
     price: Number(booking.amount || booking.price || booking.total || 0),
     status:
       booking.status ||
@@ -156,7 +264,6 @@ const normalizeBooking = (booking) => {
     raw: booking,
   };
 
-  // derive completed/upcoming from return date
   try {
     const now = new Date();
     const _return = new Date(normalized.dates.return);
@@ -201,11 +308,11 @@ const StatusBadge = ({ status }) => {
   //   default: { text: "Unknown", color: "bg-gray-500", icon: null },
   // };
   const map = {
-  completed: { text: "Đã hoàn thành", color: "bg-green-500", icon: <FaCheckCircle /> },
-  upcoming: { text: "Sắp tới", color: "bg-blue-500", icon: <FaClock /> },
-  cancelled: { text: "Đã hủy", color: "bg-red-500", icon: <FaTimesCircle /> },
-  default: { text: "Không xác định", color: "bg-gray-500", icon: null },
-};
+    completed: { text: "Đã hoàn thành", color: "bg-green-500", icon: <FaCheckCircle /> },
+    upcoming: { text: "Sắp tới", color: "bg-blue-500", icon: <FaClock /> },
+    cancelled: { text: "Đã hủy", color: "bg-red-500", icon: <FaTimesCircle /> },
+    default: { text: "Không xác định", color: "bg-gray-500", icon: null },
+  };
   const { text, color, icon } = map[status] || map.default;
   return (
     <div
@@ -413,7 +520,12 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
                 </div>
                 <div>
                   <p className={s.infoLabel}>Address:</p>
-                  <p className={s.infoValue}>{booking.user.address}</p>
+                  {/* <p className={s.infoValue}>{booking.user.address}</p> */}
+                  {booking.pickupAtStore ? "Địa chỉ:" : "Địa chỉ nhận xe:"}
+
+                  {booking.pickupAtStore
+                    ? "Nhận xe tại cửa hàng"
+                    : booking.pickupAddress || "Chưa có địa chỉ nhận xe"}
                 </div>
               </div>
 
@@ -422,15 +534,15 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
               </h3>
               <div className={s.infoCard}>
                 <div className="mb-3">
-                  <p className={s.infoLabel}>Payment Method:</p>
+                  <p className={s.infoLabel}>Phương thức thanh toán:</p>
                   <p className={s.infoValue}>
-                    {booking.paymentMethod || "â€”"}
+                    Thanh toán khi nhận xe
                   </p>
                 </div>
                 <div>
-                  <p className={s.infoLabel}>Transaction ID:</p>
+                  <p className={s.infoLabel}>Đặt cọc:</p>
                   <p className={s.infoValue}>
-                    {booking.paymentId || booking.raw?.sessionId || "â€”"}
+                    Đặt cọc bằng xe máy và giấy tờ chính chủ
                   </p>
                 </div>
               </div>

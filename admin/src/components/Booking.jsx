@@ -64,6 +64,23 @@ const extractCarInfo = (b) => {
         };
 };
 
+const formatDeliveryAddress = (booking) => {
+    const city = booking?.address?.city || "";
+    const ward = booking?.address?.state || "";
+    const detail = booking?.address?.zipCode || "";
+
+    return [detail, ward, city].filter(Boolean).join(", ");
+};
+
+const pickupMethodText = (booking) => {
+    if (booking?.pickupAtStore) {
+        return "Nhận xe tại cửa hàng";
+    }
+
+    const fullAddress = formatDeliveryAddress(booking);
+    return fullAddress ? `Giao xe tại ${fullAddress}` : "Giao xe tận nơi";
+};
+
 const Panel = ({ title, icon, children }) => (
     <div className={BookingPageStyles.panel}>
         <h3 className={BookingPageStyles.panelTitle}>
@@ -257,7 +274,7 @@ const BookingCardDetails = ({ booking }) => (
                 <Detail
                     icon={<FaMapMarkerAlt />}
                     label="Hình thức nhận xe"
-                    value={booking.deliveryMethod}
+                    value={pickupMethodText(booking)}
                 />
             </Panel>
 
@@ -265,20 +282,20 @@ const BookingCardDetails = ({ booking }) => (
                 title="Address Details"
                 icon={<FaMapMarkerAlt className={BookingPageStyles.panelIcon} />}
             >
-                <Detail
+                {/* <Detail
                     icon={<FaMapMarkerAlt />}
-                    label="Street"
+                    label="Street l"
                     value={booking.address.street}
-                />
-                <Detail icon={<FaCity />} label="City" value={booking.address.city} />
+                /> */}
+                <Detail icon={<FaCity />} label="Tỉnh / Thành phố" value={booking.address.city} />
                 <Detail
                     icon={<FaGlobeAsia />}
-                    label="State"
+                    label="Phường / Xã"
                     value={booking.address.state}
                 />
                 <Detail
                     icon={<FaMapPin />}
-                    label="ZIP Code"
+                    label="Địa chỉ chi tiết"
                     value={booking.address.zipCode}
                 />
             </Panel>
@@ -513,8 +530,8 @@ const Booking = () => {
                     deliveryMethod: b.pickupAtStore ? "Nhận xe tại cửa hàng" : "Giao xe tận nơi",
                     details,
                     address: {
-                        street:
-                            (b.address && (b.address.street || b.address.addressLine)) || "",
+                        // street:
+                        //     (b.address && (b.address.street || b.address.addressLine)) || "",
                         city: (b.address && (b.address.city || "")) || "",
                         state: (b.address && (b.address.state || "")) || "",
                         zipCode:
@@ -635,7 +652,7 @@ const Booking = () => {
                         onStatusChange={(e) => setNewStatus(e.target.value)}
                         onSaveStatus={(e) => {
                             e.stopPropagation();
-                            handleCancelEdit(booking.id, booking.status);
+                            updateStatus(booking.id);
                         }}
                         onCancelEdit={(e) => {
                             e.stopPropagation();
