@@ -7,6 +7,10 @@ import {
   FaTachometerAlt,
   FaUserFriends,
   FaShieldAlt,
+  FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
 } from "react-icons/fa";
 import axios from "axios";
 import { carPageStyles } from "../assets/dummyStyles";
@@ -33,6 +37,12 @@ const Cars = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [sortPrice, setSortPrice] = useState("default");
+
+  const [selectedCalendarCar, setSelectedCalendarCar] = useState(null);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
 
   const abortControllerRef = useRef(null);
   const base = "http://localhost:5000";
@@ -128,6 +138,109 @@ const Cars = () => {
     }
   };
 
+  const formatDateVi = (dateStr) => {
+    if (!dateStr) return "—";
+    try {
+      return new Intl.DateTimeFormat("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }).format(new Date(dateStr));
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const getNormalizedBookings = (car) => {
+    if (!Array.isArray(car?.bookings)) return [];
+
+    return car.bookings
+      .map((b) => {
+        const startRaw = b.pickupDate ?? b.startDate ?? b.start ?? b.from;
+        const endRaw = b.returnDate ?? b.endDate ?? b.end ?? b.to;
+
+        if (!startRaw || !endRaw) return null;
+
+        const start = startOfDay(startRaw);
+        const end = startOfDay(endRaw);
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+
+        return {
+          start,
+          end,
+          raw: b,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.start - b.start);
+  };
+
+  const getCurrentBooking = (car) => {
+    const today = startOfDay(new Date());
+    const bookings = getNormalizedBookings(car);
+
+    return (
+      bookings.find(
+        (b) => startOfDay(b.start) <= today && today <= startOfDay(b.end)
+      ) || null
+    );
+  };
+
+  const getNextAvailableDate = (car) => {
+    const bookings = getNormalizedBookings(car);
+    if (!bookings.length) return null;
+
+    const today = startOfDay(new Date());
+
+    const current = bookings.find(
+      (b) => startOfDay(b.start) <= today && today <= startOfDay(b.end)
+    );
+
+    if (current) {
+      const nextDate = new Date(current.end);
+      nextDate.setDate(nextDate.getDate() + 1);
+      return nextDate;
+    }
+
+    const futureBookings = bookings.filter((b) => b.start >= today);
+    if (futureBookings.length === 0) return today;
+
+    return today;
+  };
+
+  const isDateBooked = (date, car) => {
+    const target = startOfDay(date);
+    const bookings = getNormalizedBookings(car);
+
+    return bookings.some(
+      (b) => startOfDay(b.start) <= target && target <= startOfDay(b.end)
+    );
+  };
+
+  const getCalendarDays = (monthDate) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const startWeekday = (firstDay.getDay() + 6) % 7; // Thứ 2 = 0
+    const totalDays = lastDay.getDate();
+
+    const days = [];
+
+    for (let i = 0; i < startWeekday; i++) {
+      days.push(null);
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
+  };
+
   const plural = (n, singular, pluralForm) => {
     if (n === 1) return `1 ${singular}`;
     return `${n} ${pluralForm ?? singular + "s"}`;
@@ -193,118 +306,132 @@ const Cars = () => {
   };
 
   // Given an 'until' ISO date, compute day-after available date + daysUntilAvailable
-  const computeAvailableMeta = (untilIso) => {
-    if (!untilIso) return null;
-    try {
-      const until = new Date(untilIso);
-      const available = new Date(until);
-      available.setDate(available.getDate() + 1);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const daysUntilAvailable = daysBetween(today, available);
-      return { availableIso: available.toISOString(), daysUntilAvailable };
-    } catch {
-      return null;
-    }
-  };
+  // const computeAvailableMeta = (untilIso) => {
+  //   if (!untilIso) return null;
+  //   try {
+  //     const until = new Date(untilIso);
+  //     const available = new Date(until);
+  //     available.setDate(available.getDate() + 1);
+  //     const today = new Date();
+  //     today.setHours(0, 0, 0, 0);
+  //     const daysUntilAvailable = daysBetween(today, available);
+  //     return { availableIso: available.toISOString(), daysUntilAvailable };
+  //   } catch {
+  //     return null;
+  //   }
+  // };
 
-  // Render availability badge — prefer showing concrete available date when booked
-  const renderAvailabilityBadge = (rawAvailability, car) => {
+  // // Render availability badge — prefer showing concrete available date when booked
+  // const renderAvailabilityBadge = (rawAvailability, car) => {
+  //   const effective = computeEffectiveAvailability(car);
+
+  //   if (!effective) {
+  //     return (
+  //       <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
+  //         Available
+  //       </span>
+  //     );
+  //   }
+
+  //   if (effective.state === "booked") {
+  //     if (effective.until) {
+  //       const meta = computeAvailableMeta(effective.until);
+  //       if (meta && meta.availableIso) {
+  //         return (
+  //           <div className="flex flex-col items-end">
+  //             <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //               Booked — available on {formatDate(meta.availableIso)}
+  //             </span>
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               until {formatDate(effective.until)}
+  //             </small>
+  //           </div>
+  //         );
+  //       }
+  //       return (
+  //         <div className="flex flex-col items-end">
+  //           <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //             Booked
+  //           </span>
+  //           <small className="text-xs text-gray-400 mt-1">
+  //             until {formatDate(effective.until)}
+  //           </small>
+  //         </div>
+  //       );
+  //     }
+  //     return (
+  //       <div className="flex flex-col items-end">
+  //         <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //           Booked
+  //         </span>
+  //       </div>
+  //     );
+  //   }
+
+  //   if (effective.state === "available_until_reservation") {
+  //     const days = Number(effective.daysAvailable ?? -1);
+  //     if (!Number.isFinite(days) || days < 0) {
+  //       return (
+  //         <div className="flex flex-col items-end">
+  //           <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
+  //             Available
+  //           </span>
+  //           {effective.nextBookingStarts && (
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               from {formatDate(effective.nextBookingStarts)}
+  //             </small>
+  //           )}
+  //         </div>
+  //       );
+  //     }
+  //     if (days === 0) {
+  //       return (
+  //         <div className="flex flex-col items-end">
+  //           <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //             Booked — starts today
+  //           </span>
+  //           {effective.nextBookingStarts && (
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               from {formatDate(effective.nextBookingStarts)}
+  //             </small>
+  //           )}
+  //         </div>
+  //       );
+  //     }
+  //     return (
+  //       <div className="flex flex-col items-end">
+  //         <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
+  //           Available — reserved in {plural(days, "day")}
+  //         </span>
+  //         {effective.nextBookingStarts && (
+  //           <small className="text-xs text-gray-400 mt-1">
+  //             from {formatDate(effective.nextBookingStarts)}
+  //           </small>
+  //         )}
+  //       </div>
+  //     );
+  //   }
+
+  //   return (
+  //     <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
+  //       Available
+  //     </span>
+  //   );
+  // };
+
+  const renderAvailabilityBadge = (car) => {
     const effective = computeEffectiveAvailability(car);
+    const isBooked = effective?.state === "booked";
 
-    if (!effective) {
-      return (
-        <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-          Available
-        </span>
-      );
-    }
-
-    if (effective.state === "booked") {
-      if (effective.until) {
-        const meta = computeAvailableMeta(effective.until);
-        if (meta && meta.availableIso) {
-          return (
-            <div className="flex flex-col items-end">
-              <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-                Booked — available on {formatDate(meta.availableIso)}
-              </span>
-              <small className="text-xs text-gray-400 mt-1">
-                until {formatDate(effective.until)}
-              </small>
-            </div>
-          );
-        }
-        return (
-          <div className="flex flex-col items-end">
-            <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-              Booked
-            </span>
-            <small className="text-xs text-gray-400 mt-1">
-              until {formatDate(effective.until)}
-            </small>
-          </div>
-        );
-      }
-      // booked but no until info
-      return (
-        <div className="flex flex-col items-end">
-          <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-            Booked
-          </span>
-        </div>
-      );
-    }
-
-    if (effective.state === "available_until_reservation") {
-      const days = Number(effective.daysAvailable ?? -1);
-      if (!Number.isFinite(days) || days < 0) {
-        return (
-          <div className="flex flex-col items-end">
-            <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-              Available
-            </span>
-            {effective.nextBookingStarts && (
-              <small className="text-xs text-gray-400 mt-1">
-                from {formatDate(effective.nextBookingStarts)}
-              </small>
-            )}
-          </div>
-        );
-      }
-      if (days === 0) {
-        return (
-          <div className="flex flex-col items-end">
-            <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-              Booked — starts today
-            </span>
-            {effective.nextBookingStarts && (
-              <small className="text-xs text-gray-400 mt-1">
-                from {formatDate(effective.nextBookingStarts)}
-              </small>
-            )}
-          </div>
-        );
-      }
-      return (
-        <div className="flex flex-col items-end">
-          <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-            Available — reserved in {plural(days, "day")}
-          </span>
-          {effective.nextBookingStarts && (
-            <small className="text-xs text-gray-400 mt-1">
-              from {formatDate(effective.nextBookingStarts)}
-            </small>
-          )}
-        </div>
-      );
-    }
-
-    // fully_available or fallback
     return (
-      <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-        Available
-      </span>
+      <div
+        className={`absolute right-4 top-4 z-20 rounded-full px-3 py-1 text-xs font-semibold shadow-md backdrop-blur-sm whitespace-nowrap ${isBooked
+          ? "bg-red-100 text-red-700"
+          : "bg-green-100 text-green-700"
+          }`}
+      >
+        {isBooked ? "Đã được đặt" : "Có sẵn"}
+      </div>
     );
   };
 
@@ -560,9 +687,22 @@ const Cars = () => {
                   />
 
                   {/* availability badge at top-right of card */}
-                  <div className="absolute right-4 top-4 z-20">
-                    {renderAvailabilityBadge(car.availability, car)}
-                  </div>
+                  {disabled && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCalendarCar(car);
+                        setCalendarMonth(
+                          new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                        );
+                      }}
+                      className="absolute left-4 top-4 z-20 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700 shadow-md backdrop-blur-sm whitespace-nowrap transition hover:bg-orange-200 cursor-pointer"
+                    >
+                      Xem lịch trống
+                    </button>
+                  )}
+
+                  {renderAvailabilityBadge(car)}
 
                   <div className={carPageStyles.priceBadge}>
                     ₹{car.dailyRate ?? car.price ?? car.pricePerDay ?? "—"}
@@ -610,7 +750,7 @@ const Cars = () => {
                     </div>
                   </div>
 
-                  <button
+                  {/* <button
                     onClick={() => handleBook(car, id)}
                     className={`${carPageStyles.bookButton} ${disabled ? "opacity-60 cursor-not-allowed" : ""
                       }`}
@@ -626,12 +766,195 @@ const Cars = () => {
                       {disabled ? "Unavailable" : "Book Now"}
                     </span>
                     <FaArrowRight className={carPageStyles.buttonIcon} />
-                  </button>
+                  </button> */}
+
+                  {/* {disabled ? (
+                    <div className="mt-6 flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCalendarCar(car);
+                          setCalendarMonth(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+                        }}
+                        className="flex-1 rounded-2xl border border-orange-400 bg-transparent px-4 py-3 font-semibold text-orange-400 transition hover:bg-orange-500 hover:text-white"
+                      >
+                        Xem lịch trống
+                      </button>
+
+                      <div className="rounded-2xl bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-400 border border-red-500/30 whitespace-nowrap">
+                        Đã được đặt
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleBook(car, id)}
+                      className={carPageStyles.bookButton}
+                      aria-label={`Đặt ${carName}`}
+                      title={`Đặt ${carName}`}
+                    >
+                      Đặt ngay
+                      <FaArrowRight />
+                    </button>
+                  )} */}
+                  {disabled ? (
+                    <div className="mt-6">
+                      <div className="w-full rounded-2xl bg-red-500/15 px-4 py-3 text-center text-sm font-semibold text-red-400 border border-red-500/30">
+                        Đã được đặt
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleBook(car, id)}
+                      className={carPageStyles.bookButton}
+                      aria-label={`Đặt ${carName}`}
+                      title={`Đặt ${carName}`}
+                    >
+                      Đặt ngay
+                      <FaArrowRight />
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+
+        {selectedCalendarCar && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 px-4">
+            <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-slate-900 p-6 text-white shadow-2xl">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-white">
+                    Lịch trống của xe {`${selectedCalendarCar.make || selectedCalendarCar.name || ""} ${selectedCalendarCar.model || ""}`.trim()}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-300">
+                    Các ngày tô đỏ là ngày xe đã có lịch đặt.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedCalendarCar(null)}
+                  className="rounded-full border border-white/10 p-3 text-slate-300 transition hover:bg-white/10 hover:text-white"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="mb-4 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCalendarMonth(
+                      new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1)
+                    )
+                  }
+                  className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <FaChevronLeft />
+                    Tháng trước
+                  </span>
+                </button>
+
+                <div className="text-lg font-semibold text-orange-400">
+                  {new Intl.DateTimeFormat("vi-VN", {
+                    month: "long",
+                    year: "numeric",
+                  }).format(calendarMonth)}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCalendarMonth(
+                      new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1)
+                    )
+                  }
+                  className="rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    Tháng sau
+                    <FaChevronRight />
+                  </span>
+                </button>
+              </div>
+
+              <div className="mb-3 grid grid-cols-7 gap-2 text-center text-sm font-semibold text-slate-400">
+                {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d) => (
+                  <div key={d} className="py-2">
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-2">
+                {getCalendarDays(calendarMonth).map((day, index) => {
+                  if (!day) {
+                    return <div key={`empty-${index}`} className="h-12 rounded-xl bg-transparent" />;
+                  }
+
+                  const booked = isDateBooked(day, selectedCalendarCar);
+                  const isToday =
+                    startOfDay(day).getTime() === startOfDay(new Date()).getTime();
+
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className={`flex h-12 items-center justify-center rounded-xl border text-sm font-medium ${booked
+                        ? "border-red-500/40 bg-red-500/20 text-red-300"
+                        : "border-white/10 bg-slate-800 text-slate-200"
+                        } ${isToday ? "ring-2 ring-orange-400" : ""}`}
+                    >
+                      {day.getDate()}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 rounded-2xl bg-slate-800/70 p-4">
+                {(() => {
+                  const currentBooking = getCurrentBooking(selectedCalendarCar);
+                  const nextAvailableDate = getNextAvailableDate(selectedCalendarCar);
+
+                  return (
+                    <div className="space-y-2 text-sm text-slate-200">
+                      <p>
+                        {currentBooking ? (
+                          <>
+                            Xe này hiện đã được đặt từ{" "}
+                            <span className="font-semibold text-red-300">
+                              {formatDateVi(currentBooking.start)}
+                            </span>{" "}
+                            đến{" "}
+                            <span className="font-semibold text-red-300">
+                              {formatDateVi(currentBooking.end)}
+                            </span>.
+                          </>
+                        ) : (
+                          <>Xe hiện chưa có lịch đặt trùng với ngày hôm nay.</>
+                        )}
+                      </p>
+
+                      <p>
+                        {nextAvailableDate ? (
+                          <>
+                            Bạn có thể đặt xe sớm nhất từ ngày{" "}
+                            <span className="font-semibold text-green-300">
+                              {formatDateVi(nextAvailableDate)}
+                            </span>.
+                          </>
+                        ) : (
+                          <>Xe hiện đang có sẵn để đặt.</>
+                        )}
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Floating decorative elements */}
         <div className={carPageStyles.decor1}></div>
