@@ -22,6 +22,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import carsData from "../assets/carsData";
 import { carDetailStyles } from "../assets/dummyStyles";
+import { formatVND } from "../utils/formatCurrency.js";
 
 const API_BASE = "http://localhost:5000";
 const api = axios.create({
@@ -427,7 +428,7 @@ const CarDetail = () => {
 
             <h1 className={carDetailStyles.carName}>{car.make}</h1>
             <p className={carDetailStyles.carPrice}>
-              ${price}{" "}
+              {formatVND(price, true)}
               <span className={carDetailStyles.pricePerDay}>/ day</span>
             </p>
 
@@ -777,8 +778,8 @@ const CarDetail = () => {
 
                 <div className={carDetailStyles.priceBreakdown}>
                   <div className={carDetailStyles.priceRow}>
-                    <span>Rate/day</span>
-                    <span>${price}</span>
+                    <span>Giá/ngày {formatVND(price, true)}</span>
+                    {/* <span>${price}</span> */}
                   </div>
                   {formData.pickupDate && formData.returnDate && (
                     <div className={carDetailStyles.priceRow}>
@@ -787,8 +788,8 @@ const CarDetail = () => {
                     </div>
                   )}
                   <div className={carDetailStyles.totalRow}>
-                    <span>Total</span>
-                    <span>${calculateTotal()}</span>
+                    <span>Tổng tiền {formatVND(calculateTotal())}</span>
+                    {/* <span>${calculateTotal()}</span> */}
                   </div>
                 </div>
 

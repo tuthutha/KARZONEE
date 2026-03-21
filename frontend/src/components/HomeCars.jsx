@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Users, Fuel, Gauge, CheckCircle, Zap } from "lucide-react";
 import axios from "axios";
 import { homeCarsStyles as styles } from "../assets/dummyStyles";
+import { formatVND } from "../utils/formatCurrency.js";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const startOfDay = (d) => {
@@ -405,7 +406,7 @@ const HomeCars = () => {
 
                 <div className={styles.priceBadge}>
                   <span className={styles.priceText}>
-                    ₹{car.dailyRate ?? car.price ?? 0}/day
+                    {formatVND(car.dailyRate ?? car.price ?? 0, true)}
                   </span>
                 </div>
 
@@ -445,21 +446,21 @@ const HomeCars = () => {
 
                   <div className={styles.specsGrid}>
                     {[
-                      { icon: Users, value: car.seats || "4", label: "Seats" },
+                      { icon: Users, value: car.seats || "4", label: "Chỗ ngồi" },
                       {
                         icon: Fuel,
                         value: car.fuelType || "Gasoline",
-                        label: "Fuel",
+                        label: "Nhiên liệu",
                       },
                       {
                         icon: Gauge,
                         value: car.mileage ? `${car.mileage} kmpl` : "—",
-                        label: "Mileage",
+                        label: "Mức tiêu hao",
                       },
                       {
                         icon: CheckCircle,
                         value: car.transmission || "Auto",
-                        label: "Trans",
+                        label: "Hộp số",
                       },
                     ].map((spec, i) => (
                       <div key={i} className={styles.specItem}>
@@ -495,7 +496,7 @@ const HomeCars = () => {
                     }
                   >
                     <span className={styles.buttonText}>
-                      {disabled ? "Unavailable" : "Book Now"}
+                      {disabled ? "Unavailable" : "Đặt Ngay"}
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </button>

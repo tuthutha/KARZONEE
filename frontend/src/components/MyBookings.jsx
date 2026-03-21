@@ -23,6 +23,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { myBookingsStyles as s } from "../assets/dummyStyles";
+import { formatVND } from "../utils/formatCurrency.js";
 
 const API_BASE = "http://localhost:5000";
 const TIMEOUT = 15000;
@@ -49,13 +50,17 @@ const formatDate = (dateString) => {
     });
 };
 
-const formatPrice = (price) => {
-  const num = typeof price === "number" ? price : Number(price) || 0;
-  return num.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+// const formatPrice = (price) => {
+//   const num = typeof price === "number" ? price : Number(price) || 0;
+//   return num.toLocaleString("en-US", {
+//     style: "currency",
+//     currency: "USD",
+//     maximumFractionDigits: 0,
+//   });
+// };
+
+const formatPrice = (price, withSuffix = false) => {
+  return formatVND(price, withSuffix);
 };
 
 const daysBetween = (start, end) => {
@@ -340,14 +345,11 @@ const BookingCard = ({ booking, onViewDetails }) => {
         <div className={s.cardHeader}>
           <div>
             <h3 className={s.carTitle}>{booking.car.make}</h3>
-            <p className={s.carSubtitle}>
-              {booking.car.category} â€¢ {booking.car.year}
-            </p>
           </div>
           <div className="text-right">
             <p className={s.priceText}>{formatPrice(booking.price)}</p>
             <p className={s.daysText}>
-              for {days} {days > 1 ? "days" : "day"}
+              cho {days} {days > 1 ? "ngày" : "ngày"}
             </p>
           </div>
         </div>
@@ -458,7 +460,7 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
                 </div>
                 <div>
                   <p className={s.infoLabel}>Price per day</p>
-                  <p className={s.infoValue}>{formatPrice(pricePerDay)}</p>
+                  <p className={s.infoValue}>{formatPrice(pricePerDay, true)}</p>
                 </div>
                 <div>
                   <p className={s.infoLabel}>Total Price</p>

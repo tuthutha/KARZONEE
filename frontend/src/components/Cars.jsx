@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { carPageStyles } from "../assets/dummyStyles";
+import { formatVND } from "../utils/formatCurrency.js";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const startOfDay = (d) => {
@@ -24,6 +25,8 @@ const startOfDay = (d) => {
 // ceil so partial days count as next day
 const daysBetween = (from, to) =>
   Math.ceil((startOfDay(to) - startOfDay(from)) / MS_PER_DAY);
+
+const getDailyRate = (car) => Number(car.dailyRate ?? car.price ?? car.pricePerDay ?? 0);
 
 const Cars = () => {
   const navigate = useNavigate();
@@ -705,7 +708,7 @@ const Cars = () => {
                   {renderAvailabilityBadge(car)}
 
                   <div className={carPageStyles.priceBadge}>
-                    ₹{car.dailyRate ?? car.price ?? car.pricePerDay ?? "—"}
+                    {formatVND(getDailyRate(car), true)}
                     /day
                   </div>
                 </div>
