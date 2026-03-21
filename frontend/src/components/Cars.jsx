@@ -308,120 +308,6 @@ const Cars = () => {
     return { state: "fully_available", source: "none" };
   };
 
-  // Given an 'until' ISO date, compute day-after available date + daysUntilAvailable
-  // const computeAvailableMeta = (untilIso) => {
-  //   if (!untilIso) return null;
-  //   try {
-  //     const until = new Date(untilIso);
-  //     const available = new Date(until);
-  //     available.setDate(available.getDate() + 1);
-  //     const today = new Date();
-  //     today.setHours(0, 0, 0, 0);
-  //     const daysUntilAvailable = daysBetween(today, available);
-  //     return { availableIso: available.toISOString(), daysUntilAvailable };
-  //   } catch {
-  //     return null;
-  //   }
-  // };
-
-  // // Render availability badge — prefer showing concrete available date when booked
-  // const renderAvailabilityBadge = (rawAvailability, car) => {
-  //   const effective = computeEffectiveAvailability(car);
-
-  //   if (!effective) {
-  //     return (
-  //       <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-  //         Available
-  //       </span>
-  //     );
-  //   }
-
-  //   if (effective.state === "booked") {
-  //     if (effective.until) {
-  //       const meta = computeAvailableMeta(effective.until);
-  //       if (meta && meta.availableIso) {
-  //         return (
-  //           <div className="flex flex-col items-end">
-  //             <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-  //               Booked — available on {formatDate(meta.availableIso)}
-  //             </span>
-  //             <small className="text-xs text-gray-400 mt-1">
-  //               until {formatDate(effective.until)}
-  //             </small>
-  //           </div>
-  //         );
-  //       }
-  //       return (
-  //         <div className="flex flex-col items-end">
-  //           <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-  //             Booked
-  //           </span>
-  //           <small className="text-xs text-gray-400 mt-1">
-  //             until {formatDate(effective.until)}
-  //           </small>
-  //         </div>
-  //       );
-  //     }
-  //     return (
-  //       <div className="flex flex-col items-end">
-  //         <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-  //           Booked
-  //         </span>
-  //       </div>
-  //     );
-  //   }
-
-  //   if (effective.state === "available_until_reservation") {
-  //     const days = Number(effective.daysAvailable ?? -1);
-  //     if (!Number.isFinite(days) || days < 0) {
-  //       return (
-  //         <div className="flex flex-col items-end">
-  //           <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-  //             Available
-  //           </span>
-  //           {effective.nextBookingStarts && (
-  //             <small className="text-xs text-gray-400 mt-1">
-  //               from {formatDate(effective.nextBookingStarts)}
-  //             </small>
-  //           )}
-  //         </div>
-  //       );
-  //     }
-  //     if (days === 0) {
-  //       return (
-  //         <div className="flex flex-col items-end">
-  //           <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-  //             Booked — starts today
-  //           </span>
-  //           {effective.nextBookingStarts && (
-  //             <small className="text-xs text-gray-400 mt-1">
-  //               from {formatDate(effective.nextBookingStarts)}
-  //             </small>
-  //           )}
-  //         </div>
-  //       );
-  //     }
-  //     return (
-  //       <div className="flex flex-col items-end">
-  //         <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-  //           Available — reserved in {plural(days, "day")}
-  //         </span>
-  //         {effective.nextBookingStarts && (
-  //           <small className="text-xs text-gray-400 mt-1">
-  //             from {formatDate(effective.nextBookingStarts)}
-  //           </small>
-  //         )}
-  //       </div>
-  //     );
-  //   }
-
-  //   return (
-  //     <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-  //       Available
-  //     </span>
-  //   );
-  // };
-
   const renderAvailabilityBadge = (car) => {
     const effective = computeEffectiveAvailability(car);
     const isBooked = effective?.state === "booked";
@@ -467,38 +353,6 @@ const Cars = () => {
     )
   ).sort((a, b) => a.localeCompare(b));
 
-  // const filteredCars = [...cars]
-  //   .filter((car) => {
-  //     const carName = `${car.make || car.name || ""} ${car.model || ""}`.trim().toLowerCase();
-  //     const matchesSearch =
-  //       !searchTerm.trim() || carName.includes(searchTerm.trim().toLowerCase());
-
-  //     const matchesSeats =
-  //       seatFilter === "all" || String(car.seats ?? "") === String(seatFilter);
-
-  //     const matchesCategory =
-  //       categoryFilter === "all" ||
-  //       String(car.category ?? car.type ?? "").toLowerCase() === categoryFilter.toLowerCase();
-
-  //     const effective = computeEffectiveAvailability(car);
-  //     const isAvailable = !isBookDisabled(car);
-
-  //     const matchesAvailability =
-  //       availabilityFilter === "all" ||
-  //       (availabilityFilter === "available" && isAvailable) ||
-  //       (availabilityFilter === "unavailable" && !isAvailable);
-
-  //     return matchesSearch && matchesSeats && matchesCategory && matchesAvailability;
-  //   })
-  //   .sort((a, b) => {
-  //     const priceA = Number(a.dailyRate ?? a.price ?? a.pricePerDay ?? 0);
-  //     const priceB = Number(b.dailyRate ?? b.price ?? b.pricePerDay ?? 0);
-
-  //     if (sortPrice === "lowToHigh") return priceA - priceB;
-  //     if (sortPrice === "highToLow") return priceB - priceA;
-  //     return 0;
-  //   });
-
   const filteredCars = [...cars]
     .filter((car) => {
       const carName = `${car.make || car.name || ""} ${car.model || ""}`.trim().toLowerCase();
@@ -542,17 +396,6 @@ const Cars = () => {
             Khám phá các mẫu xe cho thuê với nhiều lựa chọn khác nhau, luôn sẵn sàng phục vụ cho chuyến đi của bạn.
           </p>
         </div>
-
-        {/* <div className="w-full max-w-5xl mx-auto mb-8"> */}
-        {/* <div className="mb-4">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm theo tên xe..."
-              className="w-full rounded-2xl border border-white/10 bg-slate-800/80 px-5 py-4 text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div> */}
 
         <div className="w-full max-w-5xl mx-auto mb-8">
           <div className="mb-4">
@@ -612,20 +455,6 @@ const Cars = () => {
               <option value="unavailable">Không book được</option>
             </select>
           </div>
-          {/* </div> */}
-
-          {/* <div className="flex flex-wrap gap-3 justify-center">
-            <button
-              type="button"
-              onClick={() => setAvailabilityFilter("unavailable")}
-              className={`px-6 py-3 rounded-full font-semibold transition ${availabilityFilter === "unavailable"
-                ? "bg-orange-500 text-white"
-                : "bg-slate-800 text-slate-200 hover:bg-slate-700"
-                }`}
-            >
-              Không book được
-            </button>
-          </div> */}
         </div>
 
         {/* Grid */}
@@ -752,52 +581,6 @@ const Cars = () => {
                     </div>
                   </div>
 
-                  {/* <button
-                    onClick={() => handleBook(car, id)}
-                    className={`${carPageStyles.bookButton} ${disabled ? "opacity-60 cursor-not-allowed" : ""
-                      }`}
-                    aria-label={`Book ${carName}`}
-                    title={
-                      disabled
-                        ? "Xe này hiện đang được đặt hoặc không khả dụng."
-                        : `Book ${carName}`
-                    }
-                    disabled={disabled}
-                  >
-                    <span className={carPageStyles.buttonText}>
-                      {disabled ? "Unavailable" : "Book Now"}
-                    </span>
-                    <FaArrowRight className={carPageStyles.buttonIcon} />
-                  </button> */}
-
-                  {/* {disabled ? (
-                    <div className="mt-6 flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCalendarCar(car);
-                          setCalendarMonth(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-                        }}
-                        className="flex-1 rounded-2xl border border-orange-400 bg-transparent px-4 py-3 font-semibold text-orange-400 transition hover:bg-orange-500 hover:text-white"
-                      >
-                        Xem lịch trống
-                      </button>
-
-                      <div className="rounded-2xl bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-400 border border-red-500/30 whitespace-nowrap">
-                        Đã được đặt
-                      </div>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handleBook(car, id)}
-                      className={carPageStyles.bookButton}
-                      aria-label={`Đặt ${carName}`}
-                      title={`Đặt ${carName}`}
-                    >
-                      Đặt ngay
-                      <FaArrowRight />
-                    </button>
-                  )} */}
                   {disabled ? (
                     <div className="mt-6">
                       <div className="w-full rounded-2xl bg-red-500/15 px-4 py-3 text-center text-sm font-semibold text-red-400 border border-red-500/30">

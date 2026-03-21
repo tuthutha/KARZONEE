@@ -8,6 +8,7 @@ import {
     RefreshCw,
     Users,
 } from "lucide-react";
+import { formatVND } from "../utils/formatCurrency";
 
 const baseURL = "http://localhost:5000";
 
@@ -137,7 +138,7 @@ const Statistics = () => {
                             <span className={titleClass}>Tổng doanh thu</span>
                         </div>
                         <div className={valueClass}>
-                            ${Number(summary.totalRevenue || 0).toLocaleString()}
+                            {formatVND(summary.totalRevenue || 0)}
                         </div>
                     </div>
                 </div>
@@ -186,7 +187,7 @@ const Statistics = () => {
                                         </div>
                                         <div className="text-right">
                                             <p className="font-bold text-orange-400">
-                                                ${Number(item.revenue || 0).toLocaleString()}
+                                                {formatVND(item.revenue || 0)}
                                             </p>
                                         </div>
                                     </div>
@@ -221,7 +222,7 @@ const Statistics = () => {
                                             <td className="py-3 text-white">{item.week}</td>
                                             <td className="py-3 text-white">{item.bookings}</td>
                                             <td className="py-3 text-orange-400 font-semibold">
-                                                ${Number(item.revenue || 0).toLocaleString()}
+                                                {formatVND(item.revenue || 0)}
                                             </td>
                                         </tr>
                                     ))}
@@ -257,7 +258,7 @@ const Statistics = () => {
                                                 <td className="py-3 text-white">{item.month}</td>
                                                 <td className="py-3 text-white">{item.bookings}</td>
                                                 <td className="py-3 text-orange-400 font-semibold">
-                                                    ${Number(item.revenue || 0).toLocaleString()}
+                                                    {formatVND(item.revenue || 0)}
                                                 </td>
                                             </tr>
                                         ))}
@@ -291,7 +292,7 @@ const Statistics = () => {
                                                 <td className="py-3 text-white">{item.year}</td>
                                                 <td className="py-3 text-white">{item.bookings}</td>
                                                 <td className="py-3 text-orange-400 font-semibold">
-                                                    ${Number(item.revenue || 0).toLocaleString()}
+                                                    {formatVND(item.revenue || 0)}
                                                 </td>
                                             </tr>
                                         ))}

@@ -134,7 +134,7 @@ const StatusIndicator = ({ status, isEditing, newStatus, onStatusChange }) => {
 };
 
 const BookingCardHeader = ({ booking, onToggleDetails, isExpanded }) => (
-    <div className={BookingPageStyles.bookingCardHeader}>
+    <div className={`${BookingPageStyles.bookingCardHeader} w-full xl:w-[360px] shrink-0`}>
         <div className={BookingPageStyles.bookingIconContainer}>
             <FaCalendarAlt className={BookingPageStyles.bookingIcon} />
         </div>
@@ -161,24 +161,28 @@ const BookingCardHeader = ({ booking, onToggleDetails, isExpanded }) => (
 );
 
 const BookingCardInfo = ({ booking, isEditing, newStatus, onStatusChange }) => (
-    <div className={BookingPageStyles.bookingInfoGrid}>
-        <div className="text-center">
+    <div className="w-full xl:w-auto grid grid-cols-2 md:grid-cols-[260px_120px_140px_140px] gap-4 md:gap-6 items-start">
+        <div className="text-center min-w-0">
             <div className={BookingPageStyles.bookingInfoLabel}>Car</div>
-            <div className={BookingPageStyles.bookingInfoValue}>
+            <div className={`${BookingPageStyles.bookingInfoValue} break-words leading-6`}>
                 {booking.car || ""}
             </div>
         </div>
+
         <div className="text-center">
             <div className={BookingPageStyles.bookingInfoLabel}>Pickup</div>
             <div className={BookingPageStyles.bookingInfoValue}>
                 {formatDate(booking.pickupDate)}
             </div>
         </div>
+
         <div className="text-center">
             <div className={BookingPageStyles.bookingInfoLabel}>Amount</div>
-            {/* <div className={BookingPageStyles.bookingAmount}>${booking.amount}</div> */}
-            {formatVND(booking.amount)}
+            <div className={`${BookingPageStyles.bookingInfoValue} text-white font-semibold`}>
+                {formatVND(booking.amount)}
+            </div>
         </div>
+
         <div className="text-center">
             <div className={BookingPageStyles.bookingInfoLabel}>Status</div>
             <StatusIndicator
@@ -271,7 +275,6 @@ const BookingCardDetails = ({ booking }) => (
                 <Detail
                     icon={<FaCreditCard />}
                     label="Total Amount"
-                    // value={`$${booking.amount}`}
                     value={formatVND(booking.amount)}
                 />
                 <Detail
@@ -361,7 +364,7 @@ const BookingCard = ({
 }) => (
     <div className={BookingPageStyles.bookingCard}>
         <div className="p-5 cursor-pointer" onClick={onToggleDetails}>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
                 <BookingCardHeader
                     booking={booking}
                     onToggleDetails={onToggleDetails}

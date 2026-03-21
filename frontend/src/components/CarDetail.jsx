@@ -181,11 +181,6 @@ const CarDetail = () => {
   const days = calculateDays(formData.pickupDate, formData.returnDate);
   const calculateTotal = () => days * price;
 
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((f) => ({ ...f, [name]: value }));
-  // };
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((f) => ({
@@ -233,28 +228,6 @@ const CarDetail = () => {
       const user = JSON.parse(localStorage.getItem("user"));
       const userId = user?.id;
       const token = localStorage.getItem("token");
-      // const payload = {
-      //   userId,
-      //   customer: formData.name,
-      //   email: formData.email,
-      //   phone: formData.phone,
-      //   car: {
-      //     id: car._id ?? car.id ?? null,
-      //     name: car.name ?? `${car.make ?? ""} ${car.model ?? ""}`.trim(),
-      //   },
-      //   pickupDate: formData.pickupDate,
-      //   returnDate: formData.returnDate,
-      //   amount: calculateTotal(),
-      //   details: { pickupLocation: formData.pickupLocation },
-      //   address: {
-      //     city: formData.city,
-      //     state: formData.state,
-      //     zipCode: formData.zipCode,
-      //   },
-      //   carImage: car.image
-      //     ? buildImageSrc(Array.isArray(car.image) ? car.image[0] : car.image)
-      //     : undefined,
-      // };
 
       const payload = {
         userId,
@@ -286,46 +259,6 @@ const CarDetail = () => {
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      // const res = await api.post(
-      //   `/api/payments/create-checkout-session`,
-      //   payload,
-      //   {
-      //     headers,
-      //     signal: controller.signal,
-      //   }
-      // );
-
-      // const res = await api.post(
-      //   `/api/bookings`,
-      //   payload,
-      //   { headers, signal: controller.signal }
-      // );
-
-      // if (res?.data?.url) {
-      //   toast.success("Đang chuyển đến trang thanh toán...", {
-      //     position: "top-right",
-      //     autoClose: 1200,
-      //   });
-      //   window.location.href = res.data.url;
-      //   return;
-      // }
-
-      // toast.success(
-      //   "Bạn đã đặt xe thành công!",
-      //   { position: "top-right", autoClose: 2000 }
-      // );
-      // setFormData({
-      //   pickupDate: "",
-      //   returnDate: "",
-      //   pickupLocation: "",
-      //   name: "",
-      //   email: "",
-      //   phone: "",
-      //   city: "",
-      //   state: "",
-      //   zipCode: "",
-      // });
-      // navigate("/bookings");
       const res = await api.post(
         `/api/bookings`,
         payload,
@@ -387,10 +320,8 @@ const CarDetail = () => {
 
         <div className={carDetailStyles.mainLayout}>
           <div className={carDetailStyles.leftColumn}>
-            {/* <div className={carDetailStyles.imageCarousel}> */}
             <div className={`${carDetailStyles.imageCarousel} relative`}>
               <img
-                // src={buildImageSrc(carImages[currentImage] ?? car.image)}
                 src={buildImageSrc(carImages[currentImage] || car.image)}
                 alt={car.name}
                 className={carDetailStyles.carImage}
@@ -407,23 +338,6 @@ const CarDetail = () => {
                   Xem tất cả ảnh
                 </button>
               )}
-
-              {/* {(carImages.length > 0 || (car.image && car.image !== "")) && (
-                <div className={carDetailStyles.carouselIndicators}>
-                  {(carImages.length > 0 ? carImages : [car.image]).map(
-                    (_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setCurrentImage(idx)}
-                        aria-label={`Show image ${idx + 1}`}
-                        className={carDetailStyles.carouselIndicator(
-                          idx === currentImage
-                        )}
-                      />
-                    )
-                  )}
-                </div>
-              )} */}
             </div>
 
             <h1 className={carDetailStyles.carName}>{car.make}</h1>
@@ -478,15 +392,6 @@ const CarDetail = () => {
 
             <div className={carDetailStyles.aboutSection}>
               <h2 className={carDetailStyles.aboutTitle}>Thông tin xe</h2>
-              {/* <p className={carDetailStyles.aboutText}>
-                Experience luxury in the {car.name}. With its{" "}
-                {transmissionLabel} transmission and seating for{" "}
-                {car.seats ?? "—"}, every journey is exceptional.
-              </p> */}
-              {/* <p className={carDetailStyles.aboutText}>
-                {car.description ??
-                  "This car combines performance and comfort for an unforgettable drive."}
-              </p> */}
               <p className={carDetailStyles.aboutText}>
                 {car.description?.trim() || "Chưa có mô tả cho xe này."}
               </p>
@@ -823,10 +728,6 @@ const CarDetail = () => {
                   disabled={submitting}
                   className={carDetailStyles.submitButton}
                 >
-                  {/* <FaCreditCard className="mr-2 group-hover:scale-110 transition-transform" /> */}
-                  {/* <span>
-                    {submitting ? "Đang đặt xe..." : "Đặt Xe Ngay"}
-                  </span> */}
                   <span
                     type="submit"
                     className={carDetailStyles.submitButton}

@@ -50,15 +50,6 @@ const formatDate = (dateString) => {
     });
 };
 
-// const formatPrice = (price) => {
-//   const num = typeof price === "number" ? price : Number(price) || 0;
-//   return num.toLocaleString("en-US", {
-//     style: "currency",
-//     currency: "USD",
-//     maximumFractionDigits: 0,
-//   });
-// };
-
 const formatPrice = (price, withSuffix = false) => {
   return formatVND(price, withSuffix);
 };
@@ -73,107 +64,6 @@ const daysBetween = (start, end) => {
     return 0;
   }
 };
-
-// const normalizeBooking = (booking) => {
-//   const getCarData = () => {
-//     if (!booking) return {};
-//     if (typeof booking.car === "string") return { name: booking.car };
-//     if (booking.car && typeof booking.car === "object") {
-//       const snapshot = { ...booking.car };
-//       if (snapshot.id && typeof snapshot.id === "object") {
-//         const populated = { ...snapshot.id };
-//         delete snapshot.id;
-//         return { ...snapshot, ...populated };
-//       }
-//       return snapshot;
-//     }
-//     return {};
-//   };
-
-//   const carObj = getCarData();
-//   const details = booking.details || {};
-//   const address = booking.address || {};
-
-//   const image =
-//     safeAccess(() => booking.carImage) ||
-//     safeAccess(() => carObj.image) ||
-//     "https://via.placeholder.com/800x450.png?text=No+Image";
-
-//   const pickupDate =
-//     safeAccess(() => booking.pickupDate) ||
-//     safeAccess(() => booking.dates?.pickup) ||
-//     booking.pickup ||
-//     null;
-
-//   const returnDate =
-//     safeAccess(() => booking.returnDate) ||
-//     safeAccess(() => booking.dates?.return) ||
-//     booking.return ||
-//     null;
-
-//   const normalized = {
-//     id: booking._id || booking.id || String(Math.random()).slice(2, 8),
-//     car: {
-//       make: carObj.make || carObj.name || "Unnamed Car",
-//       image,
-//       year: carObj.year || carObj.modelYear || "",
-//       category: carObj.category,
-//       seats: details.seats || carObj.seats || 4,
-//       transmission:
-//         details.transmission || carObj.transmission || carObj.gearbox || "",
-//       fuelType:
-//         details.fuelType ||
-//         details.fuel ||
-//         carObj.fuelType ||
-//         carObj.fuel ||
-//         carObj.fuel_type ||
-//         "",
-//       mileage:
-//         details.mileage || carObj.mileage || carObj.kmpl || carObj.mpg || "",
-//     },
-//     user: {
-//       name: booking.customer || safeAccess(() => booking.user?.name) || "Guest",
-//       email: booking.email || safeAccess(() => booking.user?.email) || "",
-//       phone: booking.phone || safeAccess(() => booking.user?.phone) || "",
-//       address:
-//         address.street || address.city || address.state
-//           ? `${address.street || ""}${address.city ? ", " + address.city : ""}${address.state ? ", " + address.state : ""
-//           }`
-//           : safeAccess(() => booking.user?.address) || "",
-//     },
-//     dates: { pickup: pickupDate, return: returnDate },
-//     location:
-//       address.city || booking.location || carObj.location || "Pickup location",
-//     price: Number(booking.amount || booking.price || booking.total || 0),
-//     status:
-//       booking.status ||
-//       (booking.paymentStatus === "paid" ? "active" : "") ||
-//       (booking.paymentStatus === "pending" ? "pending" : "") ||
-//       "pending",
-//     bookingDate:
-//       booking.bookingDate ||
-//       booking.createdAt ||
-//       booking.updatedAt ||
-//       Date.now(),
-//     paymentMethod: booking.paymentMethod || booking.payment?.method || "",
-//     paymentId:
-//       booking.paymentIntentId || booking.paymentId || booking.sessionId || "",
-//     raw: booking,
-//   };
-
-//   // derive completed/upcoming from return date
-//   try {
-//     const now = new Date();
-//     const _return = new Date(normalized.dates.return);
-//     if (normalized.status === "active" || normalized.status === "pending") {
-//       normalized.status = _return > now ? "upcoming" : "completed";
-//     }
-//   } catch {
-//     normalized.status = normalized.status || "upcoming";
-//   }
-
-//   return normalized;
-// };
 
 const normalizeBooking = (booking) => {
   const getCarData = () => {
@@ -294,24 +184,6 @@ const FilterButton = ({ filterKey, currentFilter, icon, label, onClick }) => (
 );
 
 const StatusBadge = ({ status }) => {
-  // const map = {
-  //   completed: {
-  //     text: "Completed",
-  //     color: "bg-green-500",
-  //     icon: <FaCheckCircle />,
-  //   },
-  //   upcoming: {
-  //     text: "Upcoming",
-  //     color: "bg-blue-500",
-  //     icon: <FaClock />
-  //   },
-  //   cancelled: {
-  //     text: "Cancelled",
-  //     color: "bg-red-500",
-  //     icon: <FaTimesCircle />,
-  //   },
-  //   default: { text: "Unknown", color: "bg-gray-500", icon: null },
-  // };
   const map = {
     completed: { text: "Đã hoàn thành", color: "bg-green-500", icon: <FaCheckCircle /> },
     upcoming: { text: "Sắp tới", color: "bg-blue-500", icon: <FaClock /> },

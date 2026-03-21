@@ -34,31 +34,6 @@ const sanitizeImageForBackend = (img) => {
     return s.replace(/^\/+/, "").replace(/^uploads\//, "");
 };
 
-// STORE IN DB
-// const buildSafeCar = (raw = {}, idx = 0) => {
-//     const _id = raw._id || raw.id || null;
-//     return {
-//         _id,
-//         id: _id || raw.id || raw.localId || `local-${idx + 1}`,
-//         make: raw.make || "",
-//         model: raw.model || "",
-//         year: raw.year ?? "",
-//         category: raw.category || "Sedan",
-//         seats: raw.seats ?? 4,
-//         transmission: raw.transmission || "Automatic",
-//         fuelType: raw.fuelType || raw.fuel || "Gasoline",
-//         mileage: raw.mileage ?? 0,
-//         dailyRate: raw.dailyRate ?? raw.price ?? 0,
-//         status: raw.status || "available",
-//         _rawImage: raw.image ?? raw._rawImage ?? "",
-//         image: raw.image
-//             ? makeImageUrl(raw.image)
-//             : raw._rawImage
-//                 ? makeImageUrl(raw._rawImage)
-//                 : "",
-//     };
-// };
-
 const buildSafeCar = (raw = {}, idx = 0) => {
     const _id = raw._id || raw.id || null;
     const images = Array.isArray(raw.images) ? raw.images : [];
@@ -141,10 +116,6 @@ const CarCard = ({ car, onEdit, onDelete }) => {
                         <p className={styles.textGray}>{car.year}</p>
                     </div>
 
-                    {/* <div className="text-2xl font-bold text-orange-500">
-                        ${car.dailyRate}
-                        <span className="text-sm text-gray-400 font-normal">/day</span>
-                    </div> */}
                     <div className="text-2xl font-bold text-orange-500">
                         {formatVND(car.dailyRate, true)}
                     </div>
@@ -300,7 +271,7 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                                 required: true,
                                 items: ["available", "rented", "maintenance"],
                             })}
-                            {inputField("Daily Rate ($)", "dailyRate", "number", {
+                            {inputField("Daily Rate (₫)", "dailyRate", "number", {
                                 required: true,
                                 min: 1,
                                 step: 0.01,

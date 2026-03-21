@@ -19,19 +19,12 @@ const AddCar = () => {
         model: "",
         description: "",
         category: "Sedan",
-        // image: null,
-        // imagePreview: null,
         images: [],
         imagePreviews: [],
     };
 
     const [data, setData] = useState(initialFormData);
     const fileRef = useRef(null);
-
-    // const handleChange = useCallback((e) => {
-    //     const { name, value } = e.target;
-    //     setData((prev) => ({ ...prev, [name]: value }));
-    // }, []);
 
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -50,35 +43,6 @@ const AddCar = () => {
             [name]: value,
         }));
     }, []);
-
-    // FOR IMG HANDLING
-    // const handleImageChange = useCallback((e) => {
-    //     const file = e.target.files?.[0];
-    //     if (!file) return;
-
-    //     const reader = new FileReader();
-    //     reader.onload = (evt) =>
-    //         setData((prev) => ({
-    //             ...prev,
-    //             image: file,
-    //             imagePreview: evt.target.result,
-    //         }));
-
-    //     reader.readAsDataURL(file);
-    // }, []);
-
-    // const handleImageChange = useCallback((e) => {
-    //     const files = Array.from(e.target.files || []).slice(0, 8);
-    //     if (!files.length) return;
-
-    //     const previews = files.map((file) => URL.createObjectURL(file));
-
-    //     setData((prev) => ({
-    //         ...prev,
-    //         images: files,
-    //         imagePreviews: previews,
-    //     }));
-    // }, []);
 
     const handleImageChange = useCallback((e) => {
         const newFiles = Array.from(e.target.files || []);
@@ -105,11 +69,6 @@ const AddCar = () => {
             fileRef.current.value = "";
         }
     }, []);
-
-    // const resetForm = useCallback(() => {
-    //     setData(initialFormData);
-    //     if (fileRef.current) fileRef.current.value = "";
-    // }, [initialFormData]);
 
     const resetForm = useCallback(() => {
         setData(initialFormData);
@@ -172,7 +131,6 @@ const AddCar = () => {
                 formData.append(key, value);
             });
 
-            // if (data.image) formData.append("image", data.image);
             data.images.forEach((file) => {
                 formData.append("images", file);
             });
@@ -307,19 +265,7 @@ const AddCar = () => {
                 ),
             },
         },
-        // {
-        //     type: "input",
-        //     config: {
-        //         name: "dailyPrice",
-        //         label: "Giá thuê mỗi ngày (đ)",
-        //         type: "text",
-        //         required: true,
-        //         min: "1",
-        //         placeholder: "45",
-        //         props: { className: "pl-8" },
-        //         prefix: <span className="absolute left-3 top-3 text-gray-400">đ</span>,
-        //     },
-        // },
+
         {
             type: "input",
             config: {
@@ -537,14 +483,7 @@ const AddCar = () => {
                                                 </p>
                                             </div>
                                         )}
-                                        {/* <input
-                                            type="file"
-                                            ref={fileRef}
-                                            name="image"
-                                            onChange={handleImageChange}
-                                            className="hidden"
-                                            accept="image/*"
-                                        /> */}
+
                                         <input
                                             ref={fileRef}
                                             type="file"
@@ -554,22 +493,6 @@ const AddCar = () => {
                                             className="hidden border-radius"
                                         />
 
-                                        {/* {data.imagePreviews.length > 0 && (
-                                            <div className="mt-4 grid grid-cols-4 gap-3">
-                                                {data.imagePreviews.slice(0, 8).map((src, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-slate-800"
-                                                    >
-                                                        <img
-                                                            src={src}
-                                                            alt={`preview-${index + 1}`}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )} */}
                                     </label>
                                     {data.imagePreviews.length > 0 && (
                                         <div className="mt-4 grid grid-cols-4 gap-3">
