@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { BookingPageStyles, statusConfig } from '../assets/dummyStyles'
 import axios from 'axios'
 import { FaCalendarAlt, FaCar, FaCheckCircle, FaChevronDown, FaCity, FaCreditCard, FaEdit, FaEnvelope, FaFilter, FaGasPump, FaGlobeAsia, FaMapMarkerAlt, FaMapPin, FaPhone, FaSearch, FaTachometerAlt, FaUser, FaUserFriends, FaSync } from 'react-icons/fa';
+import { formatVND } from "../utils/formatCurrency";
 
 const baseURL = "http://localhost:5000";
 const api = axios.create({ baseURL, headers: { Accept: 'application/json' } });
@@ -175,7 +176,8 @@ const BookingCardInfo = ({ booking, isEditing, newStatus, onStatusChange }) => (
         </div>
         <div className="text-center">
             <div className={BookingPageStyles.bookingInfoLabel}>Amount</div>
-            <div className={BookingPageStyles.bookingAmount}>${booking.amount}</div>
+            {/* <div className={BookingPageStyles.bookingAmount}>${booking.amount}</div> */}
+            {formatVND(booking.amount)}
         </div>
         <div className="text-center">
             <div className={BookingPageStyles.bookingInfoLabel}>Status</div>
@@ -269,7 +271,8 @@ const BookingCardDetails = ({ booking }) => (
                 <Detail
                     icon={<FaCreditCard />}
                     label="Total Amount"
-                    value={`$${booking.amount}`}
+                    // value={`$${booking.amount}`}
+                    value={formatVND(booking.amount)}
                 />
                 <Detail
                     icon={<FaMapMarkerAlt />}

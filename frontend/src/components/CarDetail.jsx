@@ -429,7 +429,6 @@ const CarDetail = () => {
             <h1 className={carDetailStyles.carName}>{car.make}</h1>
             <p className={carDetailStyles.carPrice}>
               {formatVND(price, true)}
-              <span className={carDetailStyles.pricePerDay}>/ day</span>
             </p>
 
             <div className={carDetailStyles.specsGrid}>

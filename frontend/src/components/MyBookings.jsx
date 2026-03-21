@@ -460,7 +460,7 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
                 </div>
                 <div>
                   <p className={s.infoLabel}>Price per day</p>
-                  <p className={s.infoValue}>{formatPrice(pricePerDay, true)}</p>
+                  <p className={s.infoValue}>{formatPrice(pricePerDay)}</p>
                 </div>
                 <div>
                   <p className={s.infoLabel}>Total Price</p>

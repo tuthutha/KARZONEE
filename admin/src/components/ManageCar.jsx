@@ -4,6 +4,7 @@ import { FaCar, FaCog, FaEdit, FaFilter, FaGasPump, FaTachometerAlt, FaTimes, Fa
 
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { formatVND } from "../utils/formatCurrency";
 
 const BASE = "http://localhost:5000";
 const api = axios.create({
@@ -140,9 +141,12 @@ const CarCard = ({ car, onEdit, onDelete }) => {
                         <p className={styles.textGray}>{car.year}</p>
                     </div>
 
-                    <div className="text-2xl font-bold text-orange-500">
+                    {/* <div className="text-2xl font-bold text-orange-500">
                         ${car.dailyRate}
                         <span className="text-sm text-gray-400 font-normal">/day</span>
+                    </div> */}
+                    <div className="text-2xl font-bold text-orange-500">
+                        {formatVND(car.dailyRate, true)}
                     </div>
                 </div>
 

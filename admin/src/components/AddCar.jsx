@@ -28,9 +28,27 @@ const AddCar = () => {
     const [data, setData] = useState(initialFormData);
     const fileRef = useRef(null);
 
+    // const handleChange = useCallback((e) => {
+    //     const { name, value } = e.target;
+    //     setData((prev) => ({ ...prev, [name]: value }));
+    // }, []);
+
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
-        setData((prev) => ({ ...prev, [name]: value }));
+
+        if (name === "dailyPrice") {
+            const onlyDigits = value.replace(/\D/g, "");
+            setData((prev) => ({
+                ...prev,
+                [name]: onlyDigits,
+            }));
+            return;
+        }
+
+        setData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     }, []);
 
     // FOR IMG HANDLING
@@ -289,15 +307,27 @@ const AddCar = () => {
                 ),
             },
         },
+        // {
+        //     type: "input",
+        //     config: {
+        //         name: "dailyPrice",
+        //         label: "Giá thuê mỗi ngày (đ)",
+        //         type: "text",
+        //         required: true,
+        //         min: "1",
+        //         placeholder: "45",
+        //         props: { className: "pl-8" },
+        //         prefix: <span className="absolute left-3 top-3 text-gray-400">đ</span>,
+        //     },
+        // },
         {
             type: "input",
             config: {
                 name: "dailyPrice",
                 label: "Giá thuê mỗi ngày (đ)",
-                type: "number",
+                type: "text",
                 required: true,
-                min: "1",
-                placeholder: "45",
+                placeholder: "100.000",
                 props: { className: "pl-8" },
                 prefix: <span className="absolute left-3 top-3 text-gray-400">đ</span>,
             },
@@ -410,7 +440,12 @@ const AddCar = () => {
                                                 <input
                                                     required={field.config.required}
                                                     name={field.config.name}
-                                                    value={data[field.config.name]}
+                                                    // value={data[field.config.name]}
+                                                    value={
+                                                        field.config.name === "dailyPrice"
+                                                            ? (Number(data.dailyPrice || 0) || "").toLocaleString("vi-VN")
+                                                            : data[field.config.name]
+                                                    }
                                                     onChange={handleChange}
                                                     type={field.config.type || "text"}
                                                     className={`${AddCarPageStyles.input} ${field.config.props?.className || ""

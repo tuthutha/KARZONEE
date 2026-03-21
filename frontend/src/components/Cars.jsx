@@ -709,7 +709,6 @@ const Cars = () => {
 
                   <div className={carPageStyles.priceBadge}>
                     {formatVND(getDailyRate(car), true)}
-                    /day
                   </div>
                 </div>
 
