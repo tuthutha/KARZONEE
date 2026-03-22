@@ -42,7 +42,7 @@ const Statistics = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#020817] text-white px-6 py-10">
+            <div className="min-h-screen bg-[#020817] text-white px-6 pt-26 pb-10">
                 <div className="max-w-7xl mx-auto">
                     <h1 className="text-5xl font-bold text-orange-400 text-center mb-4">
                         Thống kê
@@ -55,7 +55,7 @@ const Statistics = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-[#020817] text-white px-6 py-10">
+            <div className="min-h-screen bg-[#020817] text-white px-6 pt-26 pb-10">
                 <div className="max-w-7xl mx-auto">
                     <h1 className="text-5xl font-bold text-orange-400 text-center mb-4">
                         Thống kê
@@ -82,7 +82,7 @@ const Statistics = () => {
     const revenueByYear = stats?.revenueByYear || [];
 
     return (
-        <div className="min-h-screen bg-[#020817] text-white px-6 py-10">
+         <div className="min-h-screen bg-[#020817] text-white px-6 pt-26 pb-10">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">

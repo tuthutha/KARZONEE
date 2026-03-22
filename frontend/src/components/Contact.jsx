@@ -35,11 +35,11 @@ const Contact = () => {
     e.preventDefault();
 
     const whatsappMessage =
-      `Name: ${formData.name}%0A` +
+      `Tên: ${formData.name}%0A` +
       `Email: ${formData.email}%0A` +
-      `Phone: ${formData.phone}%0A` +
-      `Car Type: ${formData.carType}%0A` +
-      `Message: ${formData.message}`;
+      `Số điện thoại: ${formData.phone}%0A` +
+      `Loại xe: ${formData.carType}%0A` +
+      `Nội dung: ${formData.message}`;
 
     window.open(`https://wa.me/+84392028683?text=${whatsappMessage}`, "_blank");
 

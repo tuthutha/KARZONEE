@@ -47,8 +47,8 @@ const buildSafeCar = (raw = {}, idx = 0) => {
         year: raw.year ?? "",
         category: raw.category || "Sedan",
         seats: raw.seats ?? 4,
-        transmission: raw.transmission || "Automatic",
-        fuelType: raw.fuelType || raw.fuel || "Gasoline",
+        transmission: raw.transmission || "Số tự động",
+        fuelType: raw.fuelType || raw.fuel || "Xăng",
         mileage: raw.mileage ?? 0,
         dailyRate: raw.dailyRate ?? raw.price ?? 0,
         status: raw.status || "available",
@@ -130,13 +130,13 @@ const CarCard = ({ car, onEdit, onDelete }) => {
                     <div className="flex items-center text-sm">
                         <FaTachometerAlt className={`${styles.textOrange} mr-2`} />
                         <span className={styles.textGray300}>
-                            {(car.mileage || 0).toLocaleString()} mi
+                            {(car.mileage || 0).toLocaleString()} km
                         </span>
                     </div>
 
                     <div className="flex items-center text-sm">
                         <FaUser className={`${styles.textOrange} mr-2`} />
-                        <span className={styles.textGray300}>{car.seats} seats</span>
+                        <span className={styles.textGray300}>{car.seats} chỗ</span>
                     </div>
 
                     <div className="flex items-center text-sm">
@@ -183,7 +183,7 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!car?.make || !car?.model)
-            return toast.error("Make and Model required.");
+            return toast.error("Vui lòng nhập hãng xe và phiên bản.");
         onSubmit(mapToBackend(car));
     };
 
@@ -240,7 +240,7 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                 <div className="p-6">
                     <div className="flex justify-between items-center border-b border-orange-800/30 pb-4">
                         <h2 className="text-2xl font-bold text-white">
-                            {car._id ? `Edit: ${car.make} ${car.model}` : "Add New Car"}
+                            {car._id ? `Chỉnh sửa: ${car.make} ${car.model}` : "Thêm xe mới"}
                         </h2>
                         <button onClick={onClose} className={styles.textGray}>
                             <FaTimes className="h-6 w-6" />
@@ -249,14 +249,14 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {inputField("Make", "make", "text", { required: true })}
-                            {inputField("Model", "model", "text", { required: true })}
-                            {inputField("Year", "year", "number", {
+                            {inputField("Hãng xe", "make", "text", { required: true })}
+                            {inputField("Phiên bản", "model", "text", { required: true })}
+                            {inputField("Năm sản xuất", "year", "number", {
                                 required: true,
                                 min: 1900,
                                 max: 2099,
                             })}
-                            {inputField("Category", "category", "select", {
+                            {inputField("Loại xe", "category", "select", {
                                 required: true,
                                 items: [
                                     "Sedan",
@@ -267,35 +267,35 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                                     "Luxury",
                                 ],
                             })}
-                            {inputField("Status", "status", "select", {
+                            {inputField("Trạng thái", "status", "select", {
                                 required: true,
-                                items: ["available", "rented", "maintenance"],
+                                items: ["Có sẵn", "Có sẵn", "Bảo dưỡng"],
                             })}
-                            {inputField("Daily Rate (₫)", "dailyRate", "number", {
+                            {inputField("Giá thuê mỗi ngày (₫)", "dailyRate", "number", {
                                 required: true,
                                 min: 1,
                                 step: 0.01,
                             })}
-                            {inputField("Mileage", "mileage", "number", {
+                            {inputField("Mức tiêu hao nhiên liệu", "mileage", "number", {
                                 required: true,
                                 min: 0,
                             })}
-                            {inputField("Transmission", "transmission", "select", {
+                            {inputField("Hộp số", "transmission", "select", {
                                 required: true,
                                 items: ["Automatic", "Manual", "CVT"],
                             })}
-                            {inputField("Fuel Type", "fuelType", "select", {
+                            {inputField("Loại nhiên liệu", "fuelType", "select", {
                                 required: true,
                                 items: ["Gasoline", "Diesel", "Hybrid", "Electric"],
                             })}
                         </div>
 
-                        {inputField("Number of Seats", "seats", "number", {
+                        {inputField("Số chỗ", "seats", "number", {
                             required: true,
                             min: 1,
                             max: 12,
                         })}
-                        {inputField("Image (filename or URL)", "image", "text", {
+                        {inputField("Hình ảnh (tên file hoặc URL)", "image", "text", {
                             required: true,
                         })}
 
@@ -315,10 +315,10 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                                 onClick={onClose}
                                 className={styles.buttonSecondary}
                             >
-                                Cancel
+                                Hủy
                             </button>
                             <button type="submit" className={styles.buttonPrimary}>
-                                {car._id ? "Save Changes" : "Add Car"}
+                                {car._id ? "Lưu thay đổi" : "Lưu thay đổi"}
                             </button>
                         </div>
                     </form>

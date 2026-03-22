@@ -56,7 +56,7 @@ const handleImageError = (
     img.onerror = null;
     img.src = "https://via.placeholder.com/800x500.png?text=No+Image";
   };
-  img.alt = img.alt || "Image not available";
+  img.alt = img.alt || "Hình ảnh không khả dụng";
   img.style.objectFit = img.style.objectFit || "cover";
 };
 
@@ -161,10 +161,10 @@ const CarDetail = () => {
   }, [id]);
 
   if (!car && loadingCar)
-    return <div className="p-6 text-white">Loading car...</div>;
+    return <div className="p-6 text-white">Đang tải thông tin xe...</div>;
   if (!car && carError)
     return <div className="p-6 text-red-400">{carError}</div>;
-  if (!car) return <div className="p-6 text-white">Car not found.</div>;
+  if (!car) return <div className="p-6 text-white">Không tìm thấy xe.</div>;
 
   // const carImages = [
   //   ...(Array.isArray(car.images) ? car.images : []),
@@ -296,7 +296,7 @@ const CarDetail = () => {
         err?.response?.data?.message ||
         err?.response?.data ||
         err.message ||
-        "Booking failed";
+        "Đặt xe thất bại";
       toast.error(String(serverMessage));
     } finally {
       setSubmitting(false);

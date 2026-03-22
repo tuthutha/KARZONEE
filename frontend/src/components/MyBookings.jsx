@@ -234,7 +234,7 @@ const BookingCard = ({ booking, onViewDetails }) => {
               <FaCalendarAlt />
             </div>
             <div>
-              <p className={s.detailLabel}>Dates</p>
+              <p className={s.detailLabel}>Ngày thuê</p>
               <p className={s.detailValue}>
                 {formatDate(booking.dates.pickup)} -{" "}
                 {formatDate(booking.dates.return)}
@@ -247,7 +247,7 @@ const BookingCard = ({ booking, onViewDetails }) => {
               <FaMapMarkerAlt />
             </div>
             <div>
-              <p className={s.detailLabel}>Pickup Location</p>
+              <p className={s.detailLabel}>Địa điểm nhận xe</p>
               <p className={s.detailValue}>{booking.location}</p>
             </div>
           </div>
@@ -259,11 +259,11 @@ const BookingCard = ({ booking, onViewDetails }) => {
             onClick={() => onViewDetails(booking)}
             className={s.viewDetailsButton}
           >
-            <FaReceipt /> View Details
+            <FaReceipt /> Xem chi tiết
           </button>
           <Link to="/cars" className={s.bookAgainButton}>
             <FaCar />
-            {booking.status === "upcoming" ? "Modify" : "Book Again"}
+            {booking.status === "upcoming" ? "Chỉnh sửa" : "Đặt lại"}
           </Link>
         </div>
       </div>

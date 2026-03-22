@@ -154,7 +154,7 @@ const BookingCardHeader = ({ booking, onToggleDetails, isExpanded }) => (
                     }`}
             />
             <span className='ml-2 text-sm'>
-                {isExpanded ? 'Hide Details' : 'Show Details'}
+                {isExpanded ? 'Ẩn chi tiết' : 'Xem chi tiết'}
             </span>
         </div>
     </div>
@@ -163,28 +163,28 @@ const BookingCardHeader = ({ booking, onToggleDetails, isExpanded }) => (
 const BookingCardInfo = ({ booking, isEditing, newStatus, onStatusChange }) => (
     <div className="w-full xl:w-auto grid grid-cols-2 md:grid-cols-[260px_120px_140px_140px] gap-4 md:gap-6 items-start">
         <div className="text-center min-w-0">
-            <div className={BookingPageStyles.bookingInfoLabel}>Car</div>
+            <div className={BookingPageStyles.bookingInfoLabel}>Xe</div>
             <div className={`${BookingPageStyles.bookingInfoValue} break-words leading-6`}>
                 {booking.car || ""}
             </div>
         </div>
 
         <div className="text-center">
-            <div className={BookingPageStyles.bookingInfoLabel}>Pickup</div>
+            <div className={BookingPageStyles.bookingInfoLabel}>Ngày nhận xe</div>
             <div className={BookingPageStyles.bookingInfoValue}>
                 {formatDate(booking.pickupDate)}
             </div>
         </div>
 
         <div className="text-center">
-            <div className={BookingPageStyles.bookingInfoLabel}>Amount</div>
+            <div className={BookingPageStyles.bookingInfoLabel}>Số tiền</div>
             <div className={`${BookingPageStyles.bookingInfoValue} text-white font-semibold`}>
                 {formatVND(booking.amount)}
             </div>
         </div>
 
         <div className="text-center">
-            <div className={BookingPageStyles.bookingInfoLabel}>Status</div>
+            <div className={BookingPageStyles.bookingInfoLabel}>Trạng thái</div>
             <StatusIndicator
                 status={booking.status}
                 isEditing={isEditing}
@@ -210,7 +210,7 @@ const BookingCardActions = ({
                     }`}
             />
             <span className='ml-2 text-sm'>
-                {isExpanded ? 'Hide Details' : 'Show Details'}
+                {isExpanded ? 'Ẩn chi tiết' : 'Xem chi tiết'}
             </span>
         </div>
 

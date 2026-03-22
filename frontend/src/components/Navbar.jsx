@@ -283,7 +283,7 @@ const Navbar = () => {
                   className={styles.mobileMenuButton}
                   aria-expanded={isOpen}
                   aria-controls="mobile-menu"
-                  aria-label={isOpen ? "Close menu" : "Open menu"}
+                  aria-label={isOpen ? "Đóng menu" : "Mở menu"}
                 >
                   {isOpen ? (
                     <FaTimes className="h-5 w-5" />
@@ -333,7 +333,7 @@ const Navbar = () => {
                   className={styles.mobileAuthButton}
                 >
                   <FaSignOutAlt className="mr-3 text-base" />
-                  Logout
+                  Đăng xuất
                 </button>
               ) : (
                 <Link
@@ -342,7 +342,7 @@ const Navbar = () => {
                   className={styles.mobileAuthButton}
                 >
                   <FaUser className="mr-3 text-base" />
-                  Login
+                  Đăng nhập
                 </Link>
               )}
             </div>

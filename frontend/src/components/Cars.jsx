@@ -122,7 +122,7 @@ const Cars = () => {
     // prevent infinite loop if fallback also fails
     img.onerror = null;
     img.src = fallbackImage;
-    img.alt = img.alt || "Image not available";
+    img.alt = img.alt || "Hình ảnh không khả dụng";
     img.style.objectFit = img.style.objectFit || "cover";
   };
 
@@ -337,21 +337,25 @@ const Cars = () => {
     navigate(`/cars/${id}`, { state: { car } });
   };
 
-  const seatOptions = Array.from(
-    new Set(
-      cars
-        .map((car) => String(car.seats ?? "").trim())
-        .filter(Boolean)
-    )
-  ).sort((a, b) => Number(a) - Number(b));
+  // const seatOptions = Array.from(
+  //   new Set(
+  //     cars
+  //       .map((car) => String(car.seats ?? "").trim())
+  //       .filter(Boolean)
+  //   )
+  // ).sort((a, b) => Number(a) - Number(b));
 
-  const categoryOptions = Array.from(
-    new Set(
-      cars
-        .map((car) => String(car.category ?? car.type ?? "").trim())
-        .filter(Boolean)
-    )
-  ).sort((a, b) => a.localeCompare(b));
+  const seatOptions = ["2", "4", "5", "6", "7", "8"];
+
+  // const categoryOptions = Array.from(
+  //   new Set(
+  //     cars
+  //       .map((car) => String(car.category ?? car.type ?? "").trim())
+  //       .filter(Boolean)
+  //   )
+  // ).sort((a, b) => a.localeCompare(b));
+
+  const categoryOptions = ["Sedan", "SUV", "Sports", "Coupe", "Hatchback", "Luxury"];
 
   const filteredCars = [...cars]
     .filter((car) => {
@@ -485,9 +489,6 @@ const Cars = () => {
             </div>
           )}
 
-          {/* {!loading && !error && cars.length === 0 && (
-            <div className="col-span-full text-center">No cars available.</div>
-          )} */}
           {!loading && !error && filteredCars.length === 0 && (
             <div className="text-center text-slate-300 py-10">
               Không tìm thấy xe phù hợp.
@@ -501,7 +502,7 @@ const Cars = () => {
             const carName =
               `${car.make || car.name || ""} ${car.model || ""}`.trim() ||
               car.name ||
-              "Unnamed";
+              "Chưa có tên xe";
             const imageSrc = buildImageSrc(car.image) || fallbackImage;
             const disabled = isBookDisabled(car);
 
@@ -543,8 +544,10 @@ const Cars = () => {
 
                 <div className={carPageStyles.cardContent}>
                   <div className={carPageStyles.headerRow}>
-                    <div>
-                      <h3 className={carPageStyles.carName}>{carName}</h3>
+                    <div className="w-full min-w-0">
+                      <h3 className={`${carPageStyles.carName} block w-full min-w-0 overflow-hidden whitespace-nowrap text-ellipsis`}>
+                        {carName}
+                      </h3>
                       <p className={carPageStyles.carType}>
                         {car.category ?? car.type ?? "Sedan"}
                       </p>
@@ -556,14 +559,14 @@ const Cars = () => {
                       <div className={carPageStyles.specIconContainer}>
                         <FaUserFriends className="text-sky-400" />
                       </div>
-                      <span>{car.seats ?? "4"} Seats</span>
+                      <span>{car.seats ?? "4"} Chỗ</span>
                     </div>
 
                     <div className={carPageStyles.specItem}>
                       <div className={carPageStyles.specIconContainer}>
                         <FaGasPump className="text-amber-400" />
                       </div>
-                      <span>{car.fuelType ?? car.fuel ?? "Gasoline"}</span>
+                      <span>{car.fuelType ?? car.fuel ?? "Xăng"}</span>
                     </div>
 
                     <div className={carPageStyles.specItem}>
