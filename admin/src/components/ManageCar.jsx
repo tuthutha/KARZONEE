@@ -336,14 +336,14 @@ const NoCarsView = ({ onResetFilter }) => (
             </div>
         </div>
 
-        <h3 className="mt-4 text-xl font-medium text-white">No cars found</h3>
-        <p className="mt-2 text-gray-400">Try adjusting your filter criteria</p>
+        <h3 className="mt-4 text-xl font-medium text-white">Không tìm thấy xe nào</h3>
+        <p className="mt-2 text-gray-400">Hãy thử điều chỉnh tiêu chí lọc của bạn.</p>
 
         <button
             onClick={onResetFilter}
             className={`${styles.buttonPrimary} mt-4`}
         >
-            Show All Cars
+            Hiển thị tất cả xe
         </button>
     </div>
 );
@@ -403,10 +403,22 @@ const ManageCar = () => {
         fetchCars();
     }, [fetchCars]);
 
-    const categories = useMemo(() => [
-        "all",
-        ...Array.from(new Set(cars.map((c) => c.category || "Sedan"))),
-    ], [cars]);
+    // const categories = useMemo(() => [
+    //     "all",
+    //     ...Array.from(new Set(cars.map((c) => c.category || "Sedan"))),
+    // ], [cars]);
+    const categories = useMemo(
+  () => [
+    "all",
+    "Sedan",
+    "SUV",
+    "Sports",
+    "Coupe",
+    "Hatchback",
+    "Luxury",
+  ],
+  []
+);
 
     const filteredCars = useMemo(() =>
         cars.filter(

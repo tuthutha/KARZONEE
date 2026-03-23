@@ -739,7 +739,7 @@ const CarDetail = () => {
                   </div>
                   {formData.pickupDate && formData.returnDate && (
                     <div className={carDetailStyles.priceRow}>
-                      <span>Days</span>
+                      <span>Số ngày</span>
                       <span>{days}</span>
                     </div>
                   )}

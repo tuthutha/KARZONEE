@@ -630,14 +630,20 @@ const MyBookings = () => {
             <div className={s.emptyIconContainer}>
               <FaCar className={s.emptyIcon} />
             </div>
-            <h3 className={s.emptyTitle}>No bookings found</h3>
+            <h3 className={s.emptyTitle}>Không tìm thấy đơn đặt xe nào</h3>
             <p className={s.emptyText}>
-              {filter === "all"
-                ? "You haven't made any bookings yet. Browse our collection to get started!"
-                : `You don't have any ${filter} bookings.`}
-            </p>
+      {filter === "all"
+        ? "Bạn chưa có đơn đặt xe nào. Hãy xem danh sách xe để bắt đầu!"
+        : filter === "completed"
+        ? "Bạn chưa có đơn đặt xe đã hoàn thành nào."
+        : filter === "upcoming"
+        ? "Bạn chưa có đơn đặt xe sắp tới nào."
+        : filter === "cancelled"
+        ? "Bạn chưa có đơn đặt xe đã hủy nào."
+        : "Không có đơn đặt xe phù hợp."}
+    </p>
             <Link to="/cars" className={s.browseButton}>
-              <FaCar /> Browse Cars
+              <FaCar /> Xem danh sách xe
             </Link>
           </div>
         )}
