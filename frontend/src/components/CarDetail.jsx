@@ -15,7 +15,9 @@ import {
   FaCity,
   FaGlobeAsia,
   FaMapPin,
-  FaImages
+  FaImages,
+  FaInfoCircle,
+  FaShieldAlt
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -349,25 +351,25 @@ const CarDetail = () => {
               {[
                 {
                   Icon: FaUserFriends,
-                  label: "Seats",
+                  label: "Số chỗ",
                   value: car.seats ?? "—",
                   color: "text-orange-400",
                 },
                 {
                   Icon: FaGasPump,
-                  label: "Fuel",
+                  label: "Nhiên liệu",
                   value: car.fuel ?? car.fuelType ?? "—",
                   color: "text-green-400",
                 },
                 {
                   Icon: FaTachometerAlt,
-                  label: "Mileage",
+                  label: "Mức tiêu hao",
                   value: car.mileage ? `${car.mileage} kmpl` : "—",
                   color: "text-yellow-400",
                 },
                 {
                   Icon: FaCheckCircle,
-                  label: "Transmission",
+                  label: "Hộp số",
                   value: transmissionLabel,
                   color: "text-purple-400",
                 },
@@ -391,7 +393,7 @@ const CarDetail = () => {
             </div>
 
             <div className={carDetailStyles.aboutSection}>
-              <h2 className={carDetailStyles.aboutTitle}>Thông tin xe</h2>
+              <h2 className={carDetailStyles.aboutTitle}>Thông Tin Xe</h2>
               <p className={carDetailStyles.aboutText}>
                 {car.description?.trim() || "Chưa có mô tả cho xe này."}
               </p>
@@ -423,18 +425,66 @@ const CarDetail = () => {
                 </div>
               </div>
             </div>
+
+            <div className={carDetailStyles.aboutSection}>
+              <h2 className={carDetailStyles.aboutTitle}>Điều Khoản</h2>
+              <div className="flex items-center mb-1">
+                <FaInfoCircle className="text-blue-400 mr-2 text-sm" />
+                <span className={carDetailStyles.aboutText}>
+                  Thanh toán tiền thuê ngay khi bàn giao xe
+                </span>
+              </div>
+              <div className="flex items-center">
+                <FaInfoCircle className="text-blue-400 mr-2 text-sm" />
+                <span className={carDetailStyles.aboutText}>
+                  Quy định khác:
+                </span>
+              </div>
+              <div className="mt-2 gap-3">
+                <div className="flex items-center">
+                  <ul className="text-gray-300 text-sm">
+                    <li>- Sử dụng xe đúng mục đích.</li>
+                    <li>- Không sử dụng xe thuê vào mục đích phi pháp, trái pháp luật.</li>
+                    <li>- Không sử dụng xe thuê để cầm cố, thế chấp.</li>
+                    <li>- Không hút thuốc, nhả kẹo cao su, xả rác trong xe.</li>
+                    <li>- Không chở hàng quốc cấm dễ cháy nổ.</li>
+                    <li>- Không chở hoa quả, thực phẩm nặng mùi trong xe.</li>
+                    <li>- Khi trả xe, nếu xe bẩn hoặc có mùi trong xe, khách hàng vui lòng vệ sinh xe sạch sẽ hoặc gửi phụ thu phí vệ sinh xe.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className={carDetailStyles.aboutSection}>
+              <h2 className={carDetailStyles.aboutTitle}>Tài Sản Thế Chấp</h2>
+              <div className="flex items-center mb-1">
+                <FaShieldAlt className="text-yellow-400 mr-2 text-sm" />
+                <span className={carDetailStyles.aboutText}>
+                  Tài sản thế chấp:
+                </span>
+              </div>
+              <div className="mt-2 gap-3">
+                <div className="flex items-center">
+                  <ul className="text-gray-300 text-sm">
+                    <li>- Khách hàng vui lòng thế chấp 01 xe máy chính chủ.</li>
+                    <li>- Kèm theo giấy tờ xe bản gốc đứng tên chính chủ của khách hàng.</li>
+                    <li>- Xe và giấy tờ phải còn hiệu lực, không tranh chấp, không bị cầm cố/thế chấp tại đơn vị khác.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className={carDetailStyles.rightColumn}>
             <div className={carDetailStyles.bookingCard}>
               <h2 className={carDetailStyles.bookingTitle}>
-                Reserve{" "}
+                Thông Tin{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-500">
-                  Your Drive
+                  Đặt Xe
                 </span>
               </h2>
               <p className={carDetailStyles.bookingSubtitle}>
-                Fast · Secure · Easy
+                Nhanh · An toàn · Dễ dàng
               </p>
 
               <form onSubmit={handleSubmit} className={carDetailStyles.form}>
@@ -444,7 +494,7 @@ const CarDetail = () => {
                       htmlFor="pickupDate"
                       className={carDetailStyles.formLabel}
                     >
-                      Pickup Date
+                      Ngày nhận xe
                     </label>
                     <div
                       className={carDetailStyles.inputContainer(
@@ -474,7 +524,7 @@ const CarDetail = () => {
                       htmlFor="returnDate"
                       className={carDetailStyles.formLabel}
                     >
-                      Return Date
+                      Ngày trả xe
                     </label>
                     <div
                       className={carDetailStyles.inputContainer(
@@ -502,7 +552,7 @@ const CarDetail = () => {
 
                 <div className="flex flex-col">
                   <label className={carDetailStyles.formLabel}>
-                    Pickup Location
+                    Địa điểm nhận xe
                   </label>
                   <div
                     className={carDetailStyles.inputContainer(
@@ -515,7 +565,7 @@ const CarDetail = () => {
                     <input
                       type="text"
                       name="pickupLocation"
-                      placeholder="Enter pickup location"
+                      placeholder="Nhập địa điểm nhận xe"
                       value={formData.pickupLocation}
                       onChange={handleInputChange}
                       onFocus={() => setActiveField("pickupLocation")}
@@ -527,7 +577,7 @@ const CarDetail = () => {
                 </div>
 
                 <div className="flex flex-col">
-                  <label className={carDetailStyles.formLabel}>Full Name</label>
+                  <label className={carDetailStyles.formLabel}>Họ và tên</label>
                   <div
                     className={carDetailStyles.inputContainer(
                       activeField === "name"
@@ -539,7 +589,7 @@ const CarDetail = () => {
                     <input
                       type="text"
                       name="name"
-                      placeholder="Your full name"
+                      placeholder="Nhập họ và tên"
                       value={formData.name}
                       onChange={handleInputChange}
                       onFocus={() => setActiveField("name")}
@@ -553,7 +603,7 @@ const CarDetail = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col">
                     <label className={carDetailStyles.formLabel}>
-                      Email Address
+                      Địa chỉ Email
                     </label>
                     <div
                       className={carDetailStyles.inputContainer(
@@ -566,7 +616,7 @@ const CarDetail = () => {
                       <input
                         type="email"
                         name="email"
-                        placeholder="Your email"
+                        placeholder="Nhập email"
                         value={formData.email}
                         onChange={handleInputChange}
                         onFocus={() => setActiveField("email")}
@@ -579,7 +629,7 @@ const CarDetail = () => {
 
                   <div className="flex flex-col">
                     <label className={carDetailStyles.formLabel}>
-                      Phone Number
+                      Số điện thoại
                     </label>
                     <div
                       className={carDetailStyles.inputContainer(
@@ -592,7 +642,7 @@ const CarDetail = () => {
                       <input
                         type="tel"
                         name="phone"
-                        placeholder="Your phone number"
+                        placeholder="Nhập số điện thoại"
                         value={formData.phone}
                         onChange={handleInputChange}
                         onFocus={() => setActiveField("phone")}

@@ -226,7 +226,7 @@ const Contact = () => {
                           required
                           className={styles.select(activeField === field)}
                         >
-                          <option value="">Select Car Type</option>
+                          <option value="">Chọn loại xe</option>
                           {[
                             "Economy",
                             "SUV",
