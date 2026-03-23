@@ -9,7 +9,7 @@ import {
     FaEye,
     FaCheck
 } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logocar.png';
 import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
@@ -282,9 +282,9 @@ const SignUp = () => {
                                     className={signupStyles.form.checkboxLabel}
                                 >
                                     Tôi đồng ý với các{" "}
-                                    <span className={signupStyles.form.checkboxLink}>
+                                    <Link to="/dieu-khoan-dich-vu" className={signupStyles.form.checkboxLink}>
                                         Điều khoản & Điều kiện
-                                    </span>
+                                    </Link>
                                 </label>
                             </div>
                         </div>
@@ -314,7 +314,7 @@ const SignUp = () => {
                         className={signupStyles.signinSection}
                     >
                         <p className={signupStyles.signinText}>Bạn đã có tài khoản?
-</p>
+                        </p>
 
                         <a
                             href="/login"

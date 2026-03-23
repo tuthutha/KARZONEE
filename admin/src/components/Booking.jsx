@@ -115,20 +115,38 @@ const StatusIndicator = ({ status, isEditing, newStatus, onStatusChange }) => {
         <select
             value={newStatus}
             onChange={onStatusChange}
-            className='bg-gray-800/50 text-sm px-2 py-1 rounded focus:outline-none focus:ring-1 focus:ring-orange-500'
+            className='bg-gray-800/50 text-sm px-2 py-1 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 text-white'
         >
             {Object.keys(statusConfig).filter((k) => k !== 'default').map((opt) => (
                 <option value={opt} key={opt}>
-                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                    {/* {opt.charAt(0).toUpperCase() + opt.slice(1)} */}
+                    {opt === "pending"
+                        ? "Chờ xác nhận"
+                        : opt === "completed"
+                            ? "Hoàn thành"
+                            : opt === "active"
+                                ? "Đang xử lý"
+                                : opt === "cancelled"
+                                    ? "Đã hủy"
+                                    : opt}
                 </option>
             ))}
         </select>
     ) : (
         <span className={BookingPageStyles.statusIndicator(status)}>
             <div className={BookingPageStyles.statusIcon(status)} />
-            {String(status || 'unknown')
+            {/* {String(status || 'unknown')
                 .charAt(0)
-                .toUpperCase() + String(status || 'unknown').slice(1)}
+                .toUpperCase() + String(status || 'unknown').slice(1)} */}
+            {status === "pending"
+                ? "Chờ xác nhận"
+                : status === "completed"
+                    ? "Hoàn thành"
+                    : status === "active"
+                        ? "Đang xử lý"
+                        : status === "cancelled"
+                            ? "Đã hủy"
+                            : "Không xác định"}
         </span>
     )
 };
@@ -220,13 +238,13 @@ const BookingCardActions = ({
                     <button
                         className={BookingPageStyles.bookingActionButton('green')}
                         onClick={onSaveStatus}>
-                        Save
+                        Lưu
                     </button>
 
                     <button
                         className={BookingPageStyles.bookingActionButton('gray')}
                         onClick={onCancelEdit}>
-                        Cancel
+                        Hủy
                     </button>
                 </>
             ) : (
@@ -234,7 +252,7 @@ const BookingCardActions = ({
                     onClick={onEditStatus}
                     className={BookingPageStyles.bookingEditButton}
                     title='Edit Status'>
-                    <FaEdit className='inline mr-1' /> Edit
+                    <FaEdit className='inline mr-1' /> Chỉnh Sửa
                 </button>
             )}
         </div>
@@ -245,36 +263,36 @@ const BookingCardDetails = ({ booking }) => (
     <div className={BookingPageStyles.bookingDetails}>
         <div className={BookingPageStyles.bookingDetailsGrid}>
             <Panel
-                title="Customer Details"
+                title="Thông Tin Khách Hàng"
                 icon={<FaUser className={BookingPageStyles.panelIcon} />}
             >
-                <Detail icon={<FaUser />} label="Full Name" value={booking.customer} />
+                <Detail icon={<FaUser />} label="Họ và tên" value={booking.customer} />
                 <Detail icon={<FaEnvelope />} label="Email" value={booking.email} />
-                <Detail icon={<FaPhone />} label="Phone" value={booking.phone} />
+                <Detail icon={<FaPhone />} label="Số điện thoại" value={booking.phone} />
             </Panel>
 
             <Panel
-                title="Booking Details"
+                title="Thông Tin Đặt Xe"
                 icon={<FaCalendarAlt className={BookingPageStyles.panelIcon} />}
             >
                 <Detail
                     icon={<FaCalendarAlt />}
-                    label="Pickup Date"
+                    label="Ngày nhận xe"
                     value={formatDate(booking.pickupDate)}
                 />
                 <Detail
                     icon={<FaCalendarAlt />}
-                    label="Return Date"
+                    label="Ngày trả xe"
                     value={formatDate(booking.returnDate)}
                 />
                 <Detail
                     icon={<FaCalendarAlt />}
-                    label="Booking Date"
+                    label="Ngày đặt xe"
                     value={formatDate(booking.bookingDate)}
                 />
                 <Detail
                     icon={<FaCreditCard />}
-                    label="Total Amount"
+                    label="Tổng tiền"
                     value={formatVND(booking.amount)}
                 />
                 <Detail
@@ -285,7 +303,7 @@ const BookingCardDetails = ({ booking }) => (
             </Panel>
 
             <Panel
-                title="Address Details"
+                title="Thông Tin Địa Chỉ"
                 icon={<FaMapMarkerAlt className={BookingPageStyles.panelIcon} />}
             >
                 {/* <Detail
@@ -307,7 +325,7 @@ const BookingCardDetails = ({ booking }) => (
             </Panel>
 
             <Panel
-                title="Car Details"
+                title="Thông Tin Xe"
                 icon={<FaCar className={BookingPageStyles.panelIcon} />}
             >
                 <div className="flex items-center mb-4">
@@ -327,22 +345,22 @@ const BookingCardDetails = ({ booking }) => (
                 <div className="grid grid-cols-2 gap-4">
                     <Spec
                         icon={<FaUserFriends />}
-                        label="Seats"
+                        label="Số chỗ"
                         value={booking.details.seats}
                     />
                     <Spec
                         icon={<FaGasPump />}
-                        label="Fuel"
+                        label="Nhiên liệu"
                         value={booking.details.fuel}
                     />
                     <Spec
                         icon={<FaTachometerAlt />}
-                        label="Mileage"
+                        label="Mức tiêu hao"
                         value={booking.details.mileage}
                     />
                     <Spec
                         icon={<FaCheckCircle />}
-                        label="Transmission"
+                        label="Hộp số"
                         value={booking.details.transmission}
                     />
                 </div>
@@ -402,11 +420,11 @@ const SearchFilterBar = ({
     <div className={BookingPageStyles.searchFilterContainer}>
         <div className={BookingPageStyles.searchFilterGrid}>
             <div>
-                <label className={BookingPageStyles.filterLabel}>Search Bookings</label>
+                <label className={BookingPageStyles.filterLabel}>Tìm kiếm đơn đặt xe</label>
                 <div className="relative">
                     <input
                         type="text"
-                        placeholder="Search by customer, car, or email..."
+                        placeholder="Tìm kiếm theo khách hàng, xe hoặc email..."
                         value={searchTerm}
                         onChange={onSearchChange}
                         className={BookingPageStyles.filterInput}
@@ -419,7 +437,7 @@ const SearchFilterBar = ({
 
             <div>
                 <label className={BookingPageStyles.filterLabel}>
-                    Filter by Status
+                    Lọc theo trạng thái
                 </label>
                 <div className="relative">
                     <select
@@ -427,7 +445,7 @@ const SearchFilterBar = ({
                         onChange={onStatusChange}
                         className={BookingPageStyles.filterInput}
                     >
-                        <option value="all">All Statuses</option>
+                        <option value="all">Tất cả trạng thái</option>
                         {Object.keys(statusConfig)
                             .filter((k) => k !== "default")
                             .map((opt) => (
@@ -445,7 +463,7 @@ const SearchFilterBar = ({
             <div className={BookingPageStyles.totalBookingsContainer}>
                 <div className="text-center">
                     <div className={BookingPageStyles.totalBookingsLabel}>
-                        Total Bookings
+                        Tổng số đơn đặt xe
                     </div>
                     <div className={BookingPageStyles.totalBookingsValue}>
                         {totalBookings}
@@ -491,11 +509,11 @@ const PageHeader = () => (
         </div>
 
         <h1 className={BookingPageStyles.title}>
-            <span className={BookingPageStyles.titleGradient}>Booking Dashboard</span>
+            <span className={BookingPageStyles.titleGradient}>Bảng Quản Lý Đặt Xe</span>
         </h1>
 
         <p className={BookingPageStyles.subtitle}>
-            Manage all bookings with detailed information and status updates.
+            Quản lý tất cả đơn đặt xe với thông tin chi tiết và cập nhật trạng thái.
         </p>
     </div>
 );

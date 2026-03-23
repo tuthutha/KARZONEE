@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
+import { signupStyles } from '../assets/dummyStyles';
 import {
   FaUserFriends,
   FaGasPump,
@@ -267,11 +268,6 @@ const CarDetail = () => {
         { headers, signal: controller.signal }
       );
 
-      toast.success("Bạn đã đặt xe thành công!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-
       setFormData({
         pickupDate: "",
         returnDate: "",
@@ -286,7 +282,13 @@ const CarDetail = () => {
         pickupAtStore: false,
       });
 
-      navigate("/bookings");
+      navigate("/bookings", {
+        state: {
+          bookingSuccess: true,
+          bookingMessage:
+            "Đặt xe thành công! Vui lòng vào Đơn đặt xe của tôi để theo dõi.",
+        },
+      });
     } catch (err) {
       const canceled =
         err?.code === "ERR_CANCELED" ||
@@ -306,8 +308,8 @@ const CarDetail = () => {
   };
 
   const transmissionLabel = car.transmission
-    ? String(car.transmission).toLowerCase()
-    : "standard";
+    ? String(car.transmission).trim()
+    : "Số tự động";
 
   return (
     <div className={carDetailStyles.pageContainer}>
@@ -768,7 +770,11 @@ const CarDetail = () => {
                       className="mt-1"
                     />
                     <span>
-                      Bằng việc đặt xe, bạn đồng ý với các <b>Điều khoản &amp; Điều kiện</b> của chúng tôi
+                      Bằng việc đặt xe, bạn đồng ý với các {" "}
+                      <Link to="/dieu-khoan-dich-vu" className={signupStyles.form.checkboxLink}>
+                        Điều khoản & Điều kiện
+                      </Link>
+                      {" "}của chúng tôi
                     </span>
                   </label>
                 </div>

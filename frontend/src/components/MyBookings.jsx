@@ -41,11 +41,12 @@ const safeAccess = (fn, fallback = "") => {
 const formatDate = (dateString) => {
   if (!dateString) return "-";
   const d = new Date(dateString);
+
   return Number.isNaN(d.getTime())
     ? String(dateString)
-    : d.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
+    : d.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
     });
 };
@@ -281,7 +282,7 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
         <div className={s.modalContent}>
           <div className={s.modalHeader}>
             <h2 className={s.modalTitle}>
-              <FaReceipt className="text-orange-400" /> Booking Details
+              <FaReceipt className="text-orange-400" /> Chi Tiết Đơn Đặt Xe
             </h2>
             <div className="flex items-center gap-2">
               {booking.status === "upcoming" && (
@@ -317,25 +318,25 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
               <div className={s.carTags}>
                 <span className={s.carTag}>{booking.car.category}</span>
                 <span className={s.carTag}>{booking.car.year}</span>
-                <span className={s.carTag}>{booking.car.seats} seats</span>
+                <span className={s.carTag}>{booking.car.seats} chỗ</span>
                 <span className={s.carTag}>{booking.car.transmission}</span>
               </div>
 
               <div className={s.infoGrid}>
                 <div>
-                  <p className={s.infoLabel}>Fuel Type</p>
+                  <p className={s.infoLabel}>Nhiên liệu</p>
                   <p className={s.infoValue}>{booking.car.fuelType}</p>
                 </div>
                 <div>
-                  <p className={s.infoLabel}>Mileage</p>
+                  <p className={s.infoLabel}>Mức tiêu hao</p>
                   <p className={s.infoValue}>{booking.car.mileage}</p>
                 </div>
                 <div>
-                  <p className={s.infoLabel}>Price per day</p>
+                  <p className={s.infoLabel}>Giá/ngày</p>
                   <p className={s.infoValue}>{formatPrice(pricePerDay)}</p>
                 </div>
                 <div>
-                  <p className={s.infoLabel}>Total Price</p>
+                  <p className={s.infoLabel}>Tổng tiền</p>
                   <p className={s.priceValue}>{formatPrice(booking.price)}</p>
                 </div>
               </div>
@@ -345,43 +346,43 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
           <div className={s.modalGrid}>
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <FaCalendarAlt className="text-orange-400" /> Booking Dates
+                <FaCalendarAlt className="text-orange-400" /> Thông Tin Thời Gian Thuê
               </h3>
               <div className={s.infoCard}>
                 <div className={s.infoRow}>
-                  <p className={s.infoLabel}>Pickup Date:</p>
+                  <p className={s.infoLabel}>Ngày nhận xe:</p>
                   <p className={s.infoValue}>
                     {formatDate(booking.dates.pickup)}
                   </p>
                 </div>
                 <div className={s.infoRow}>
-                  <p className={s.infoLabel}>Return Date:</p>
+                  <p className={s.infoLabel}>Ngày trả xe:</p>
                   <p className={s.infoValue}>
                     {formatDate(booking.dates.return)}
                   </p>
                 </div>
                 <div className={`${s.infoRow} ${s.infoDivider}`}>
-                  <p className={s.infoLabel}>Duration:</p>
-                  <p className={s.infoValue}>{days} days</p>
+                  <p className={s.infoLabel}>Thời gian thuê:</p>
+                  <p className={s.infoValue}>{days} ngày</p>
                 </div>
               </div>
 
               <h3 className="text-lg font-semibold flex items-center gap-2 mt-6">
-                <FaMapMarkerAlt className="text-orange-400" /> Location Details
+                <FaMapMarkerAlt className="text-orange-400" /> Địa Điểm Nhận Xe
               </h3>
               <div className={s.infoCard}>
-                <p className={s.infoLabel}>Pickup Location:</p>
+                <p className={s.infoLabel}>Địa chỉ chi tiết:</p>
                 <p className={s.infoValue}>{booking.location}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2 mt-6">
-                <FaUser className="text-orange-400" /> User Information
+                <FaUser className="text-orange-400" /> Thông Tin Khách Hàng
               </h3>
               <div className={s.infoCard}>
                 <div className="mb-3">
-                  <p className={s.infoLabel}>Full Name:</p>
+                  <p className={s.infoLabel}>Họ và tên:</p>
                   <p className={s.infoValue}>{booking.user.name}</p>
                 </div>
                 <div className="mb-3">
@@ -389,13 +390,13 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
                   <p className={s.infoValue}>{booking.user.email}</p>
                 </div>
                 <div className="mb-3">
-                  <p className={s.infoLabel}>Phone:</p>
+                  <p className={s.infoLabel}>Số điện thoại:</p>
                   <p className={s.infoValue}>{booking.user.phone}</p>
                 </div>
                 <div>
-                  <p className={s.infoLabel}>Address:</p>
-                  {/* <p className={s.infoValue}>{booking.user.address}</p> */}
-                  {booking.pickupAtStore ? "Địa chỉ:" : "Địa chỉ nhận xe:"}
+                  <p className={s.infoLabel}>Địa chỉ:</p>
+                  <p className={s.infoValue}>{booking.user.address}</p>
+                  {/* {booking.pickupAtStore ? "Địa chỉ:" : "Địa chỉ nhận xe:"} */}
 
                   {booking.pickupAtStore
                     ? "Nhận xe tại cửa hàng"
@@ -426,11 +427,11 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
           <div className={s.infoCard}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className={s.infoLabel}>Booking Status:</p>
+                <p className={s.infoLabel}>Trạng thái đơn:</p>
                 <StatusBadge status={booking.status} />
               </div>
               <div>
-                <p className={s.infoLabel}>Booking Date:</p>
+                <p className={s.infoLabel}>Ngày đặt xe:</p>
                 <p className={s.infoValue}>{formatDate(booking.bookingDate)}</p>
               </div>
             </div>
@@ -438,10 +439,10 @@ const BookingModal = ({ booking, onClose, onCancel }) => {
 
           <div className={s.modalActions}>
             <button type="button" onClick={onClose} className={s.closeButton}>
-              Close
+              Đóng
             </button>
             <Link to="/cars" onClick={onClose} className={s.modalBookButton}>
-              Book Again <FaArrowRight className="text-sm" />
+              Đặt Lại <FaArrowRight className="text-sm" />
             </Link>
           </div>
         </div>
