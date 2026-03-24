@@ -51,11 +51,32 @@ const buildSafeCar = (raw = {}, idx = 0) => {
         fuelType: raw.fuelType || raw.fuel || "Xăng",
         mileage: raw.mileage ?? 0,
         dailyRate: raw.dailyRate ?? raw.price ?? 0,
-        status: raw.status || "available",
+        status: normalizeStatus(raw.status),
         images,
         _rawImage: primary,
         image: primary ? makeImageUrl(primary) : "",
     };
+};
+
+const normalizeStatus = (status) => {
+    const s = String(status || "").trim().toLowerCase();
+
+    if (["available", "có sẵn", "co san"].includes(s)) return "available";
+    if (["booked", "rented", "đã được đặt", "da duoc dat"].includes(s)) return "booked";
+    if (["maintenance", "bảo dưỡng", "bao duong"].includes(s)) return "maintenance";
+
+    return "available";
+};
+
+const getStatusLabel = (status) => {
+    switch (status) {
+        case "booked":
+            return "Đã được đặt";
+        case "maintenance":
+            return "Đang bảo dưỡng";
+        default:
+            return "Có sẵn";
+    }
 };
 
 // SUB - COMPONENTS
@@ -82,7 +103,7 @@ const CarCard = ({ car, onEdit, onDelete }) => {
     const getStatusStyle = (status) => {
         const styles = {
             available: "bg-green-900/30 text-green-400",
-            rented: "bg-yellow-900/30 text-yellow-400",
+            booked: "bg-yellow-900/30 text-yellow-400",
             maintenance: "bg-red-900/30 text-red-400",
         };
         return styles[status] || "bg-gray-700 text-gray-200";
@@ -102,7 +123,7 @@ const CarCard = ({ car, onEdit, onDelete }) => {
 
                 <div className="absolute top-4 right-4">
                     <span className={`${styles.statusBadge} ${getStatusStyle(car.status)}`}>
-                        {car.status.charAt(0).toUpperCase() + car.status.slice(1)}
+                        {getStatusLabel(car.status)}
                     </span>
                 </div>
             </div>
@@ -176,7 +197,7 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
         fuelType: c.fuelType,
         mileage: Number(c.mileage || 0),
         dailyRate: Number(c.dailyRate || 0),
-        status: c.status || "available",
+        status: normalizeStatus(c.status),
         image: sanitizeImageForBackend(c.image || c._rawImage || ""),
     });
 
@@ -199,38 +220,72 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
         });
     };
 
+    // const inputField = (label, name, type = "text", options = {}) => (
+    //     <div>
+    //         <label className={`block ${styles.textGray} text-sm mb-1`}>{label}</label>
+    //         {type === "select" ? (
+    //             <select
+    //                 name={name}
+    //                 value={car[name] || ""}
+    //                 onChange={handleInputChange}
+    //                 className={styles.inputField}
+    //                 required={options.required}
+    //             >
+    //                 {options.items?.map((opt) => (
+    //                     <option key={opt} value={opt}>
+    //                         {opt}
+    //                     </option>
+    //                 ))}
+    //             </select>
+    //         ) : (
+    //             <input
+    //                 type={type}
+    //                 name={name}
+    //                 value={car[name] || ""}
+    //                 onChange={handleInputChange}
+    //                 className={styles.inputField}
+    //                 required={options.required}
+    //                 min={options.min}
+    //                 max={options.max}
+    //                 step={options.step}
+    //             />
+    //         )}
+    //     </div>
+    // );
+
     const inputField = (label, name, type = "text", options = {}) => (
-        <div>
-            <label className={`block ${styles.textGray} text-sm mb-1`}>{label}</label>
-            {type === "select" ? (
-                <select
-                    name={name}
-                    value={car[name] || ""}
-                    onChange={handleInputChange}
-                    className={styles.inputField}
-                    required={options.required}
-                >
-                    {options.items?.map((opt) => (
-                        <option key={opt} value={opt}>
-                            {opt}
-                        </option>
-                    ))}
-                </select>
-            ) : (
-                <input
-                    type={type}
-                    name={name}
-                    value={car[name] || ""}
-                    onChange={handleInputChange}
-                    className={styles.inputField}
-                    required={options.required}
-                    min={options.min}
-                    max={options.max}
-                    step={options.step}
-                />
-            )}
-        </div>
-    );
+  <div>
+    <label className="block text-sm text-gray-300 mb-2">{label}</label>
+
+    {type === "select" ? (
+      <select
+        name={name}
+        value={car[name] ?? ""}
+        onChange={handleInputChange}
+        className={styles.inputField}
+        required={options.required}
+      >
+        {options.items?.map((opt) => (
+          <option key={opt} value={opt}>
+            {options.labels?.[opt] || opt}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <input
+        type={type}
+        name={name}
+        value={car[name] ?? ""}
+        onChange={handleInputChange}
+        className={styles.inputField}
+        required={options.required}
+        min={options.min}
+        max={options.max}
+        step={options.step}
+      />
+    )}
+  </div>
+);
 
     return (
         <div className={styles.modalOverlay}>
@@ -269,7 +324,12 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                             })}
                             {inputField("Trạng thái", "status", "select", {
                                 required: true,
-                                items: ["Có sẵn", "Có sẵn", "Bảo dưỡng"],
+                                items: ["available", "booked", "maintenance"],
+                                labels: {
+                                    available: "Có sẵn",
+                                    booked: "Đã được đặt",
+                                    maintenance: "Đang bảo dưỡng",
+                                },
                             })}
                             {inputField("Giá thuê mỗi ngày (₫)", "dailyRate", "number", {
                                 required: true,
@@ -281,13 +341,13 @@ const EditModal = ({ car, onClose, onSubmit, onChange }) => {
                                 min: 0,
                             })}
                             {inputField("Hộp số", "transmission", "select", {
-                                required: true,
-                                items: ["Automatic", "Manual", "CVT"],
-                            })}
+  required: true,
+  items: ["Số tự động", "Số sàn", "CVT"],
+})}
                             {inputField("Loại nhiên liệu", "fuelType", "select", {
-                                required: true,
-                                items: ["Gasoline", "Diesel", "Hybrid", "Electric"],
-                            })}
+  required: true,
+  items: ["Xăng", "Dầu", "Hybrid", "Điện"],
+})}
                         </div>
 
                         {inputField("Số chỗ", "seats", "number", {
@@ -408,17 +468,17 @@ const ManageCar = () => {
     //     ...Array.from(new Set(cars.map((c) => c.category || "Sedan"))),
     // ], [cars]);
     const categories = useMemo(
-  () => [
-    "all",
-    "Sedan",
-    "SUV",
-    "Sports",
-    "Coupe",
-    "Hatchback",
-    "Luxury",
-  ],
-  []
-);
+        () => [
+            "all",
+            "Sedan",
+            "SUV",
+            "Sports",
+            "Coupe",
+            "Hatchback",
+            "Luxury",
+        ],
+        []
+    );
 
     const filteredCars = useMemo(() =>
         cars.filter(

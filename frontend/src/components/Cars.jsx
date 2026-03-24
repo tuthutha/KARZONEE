@@ -252,53 +252,119 @@ const Cars = () => {
   // Compute canonical availability:
   // - prefer car.bookings (if present): find any booking that covers today -> booked until booking.return
   // - otherwise fallback to car.availability provided by backend
+  // const computeEffectiveAvailability = (car) => {
+  //   const today = new Date();
+
+  //   if (Array.isArray(car.bookings) && car.bookings.length) {
+  //     const overlapping = car.bookings
+  //       .map((b) => {
+  //         const pickup = b.pickupDate ?? b.startDate ?? b.start ?? b.from;
+  //         const ret = b.returnDate ?? b.endDate ?? b.end ?? b.to;
+  //         if (!pickup || !ret) return null;
+  //         return { pickup: new Date(pickup), return: new Date(ret), raw: b };
+  //       })
+  //       .filter(Boolean)
+  //       .filter(
+  //         (b) =>
+  //           startOfDay(b.pickup) <= startOfDay(today) &&
+  //           startOfDay(today) <= startOfDay(b.return)
+  //       );
+
+  //     if (overlapping.length > 0) {
+  //       overlapping.sort((a, b) => b.return - a.return);
+  //       return {
+  //         state: "booked",
+  //         until: overlapping[0].return.toISOString(),
+  //         source: "bookings",
+  //       };
+  //     }
+  //   }
+
+  //   if (car.availability) {
+  //     if (car.availability.state === "booked" && car.availability.until) {
+  //       return {
+  //         state: "booked",
+  //         until: car.availability.until,
+  //         source: "availability",
+  //       };
+  //     }
+
+  //     if (
+  //       car.availability.state === "available_until_reservation" &&
+  //       Number(car.availability.daysAvailable ?? -1) === 0
+  //     ) {
+  //       // reservation starts today -> treat as booked
+  //       return {
+  //         state: "booked",
+  //         until: car.availability.until ?? null,
+  //         source: "availability-res-starts-today",
+  //         nextBookingStarts: car.availability.nextBookingStarts,
+  //       };
+  //     }
+
+  //     return { ...car.availability, source: "availability" };
+  //   }
+
+  //   return { state: "fully_available", source: "none" };
+  // };
+
   const computeEffectiveAvailability = (car) => {
-    const today = new Date();
+    const today = startOfDay(new Date());
 
     if (Array.isArray(car.bookings) && car.bookings.length) {
-      const overlapping = car.bookings
+      const blockingBookings = car.bookings
         .map((b) => {
           const pickup = b.pickupDate ?? b.startDate ?? b.start ?? b.from;
           const ret = b.returnDate ?? b.endDate ?? b.end ?? b.to;
+          const status = b.status ?? "pending";
+
           if (!pickup || !ret) return null;
-          return { pickup: new Date(pickup), return: new Date(ret), raw: b };
+          if (!["pending", "active", "upcoming"].includes(status)) return null;
+
+          return {
+            pickup: startOfDay(new Date(pickup)),
+            return: startOfDay(new Date(ret)),
+            raw: b,
+          };
         })
         .filter(Boolean)
-        .filter(
-          (b) =>
-            startOfDay(b.pickup) <= startOfDay(today) &&
-            startOfDay(today) <= startOfDay(b.return)
+        .sort((a, b) => a.pickup - b.pickup);
+
+      if (blockingBookings.length > 0) {
+        const currentBooking = blockingBookings.find(
+          (b) => b.pickup <= today && today <= b.return
         );
 
-      if (overlapping.length > 0) {
-        overlapping.sort((a, b) => b.return - a.return);
+        if (currentBooking) {
+          return {
+            state: "booked",
+            until: currentBooking.return.toISOString(),
+            source: "bookings-current",
+          };
+        }
+
+        const nextBooking = blockingBookings[0];
         return {
           state: "booked",
-          until: overlapping[0].return.toISOString(),
-          source: "bookings",
+          until: nextBooking.return.toISOString(),
+          nextBookingStarts: nextBooking.pickup.toISOString(),
+          source: "bookings-future",
         };
       }
     }
 
     if (car.availability) {
-      if (car.availability.state === "booked" && car.availability.until) {
-        return {
-          state: "booked",
-          until: car.availability.until,
-          source: "availability",
-        };
-      }
-
       if (
-        car.availability.state === "available_until_reservation" &&
-        Number(car.availability.daysAvailable ?? -1) === 0
+        car.availability.state === "booked" ||
+        car.availability.state === "available_until_reservation"
       ) {
-        // reservation starts today -> treat as booked
         return {
           state: "booked",
-          until: car.availability.until ?? null,
-          source: "availability-res-starts-today",
-          nextBookingStarts: car.availability.nextBookingStarts,
+          until:
+            car.availability.until ??
+            car.availability.nextBookingStarts ??
+            null,
+          source: "availability",
         };
       }
 
@@ -358,6 +424,7 @@ const Cars = () => {
   const categoryOptions = ["Sedan", "SUV", "Sports", "Coupe", "Hatchback", "Luxury"];
 
   const filteredCars = [...cars]
+    .filter((car) => String(car.status || "available") !== "maintenance")
     .filter((car) => {
       const carName = `${car.make || car.name || ""} ${car.model || ""}`.trim().toLowerCase();
 

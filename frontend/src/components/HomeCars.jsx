@@ -31,7 +31,7 @@ const HomeCars = () => {
   });
   // const limit = 6;
   const fetchLimit = 0;
-  const homeDisplayLimit = 9;
+  const homeDisplayLimit = 6;
   const fallbackImage = `${base}/uploads/default-car.png`;
 
   useEffect(() => {
@@ -193,87 +193,137 @@ const HomeCars = () => {
     }
   };
 
+  // const renderAvailabilityBadge = (rawAvailability, car) => {
+  //   const effective = computeEffectiveAvailability(car);
+  //   if (!effective)
+  //     return (
+  //       <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
+  //         Có sẵn
+  //       </span>
+  //     );
+
+  //   if (effective.state === "booked") {
+  //     if (effective.until) {
+  //       const meta = computeAvailableMeta(effective.until);
+  //       if (meta?.availableIso) {
+  //         return (
+  //           <div className="flex flex-col items-end">
+  //             <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //               Booked — available on {formatDate(meta.availableIso)}
+  //             </span>
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               until {formatDate(effective.until)}
+  //             </small>
+  //           </div>
+  //         );
+  //       }
+  //       return (
+  //         <div className="flex flex-col items-end">
+  //           <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //             Booked
+  //           </span>
+  //           {effective.until && (
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               until {formatDate(effective.until)}
+  //             </small>
+  //           )}
+  //         </div>
+  //       );
+  //     }
+  //     return (
+  //       <div className="flex flex-col items-end">
+  //         <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+  //           Booked
+  //         </span>
+  //       </div>
+  //     );
+  //   }
+
+  //   if (effective.state === "available_until_reservation") {
+  //     const days = Number(effective.daysAvailable ?? -1);
+  //     if (!Number.isFinite(days) || days < 0) {
+  //       return (
+  //         <div className="flex flex-col items-end">
+  //           <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
+  //             Available
+  //           </span>
+  //           {effective.nextBookingStarts && (
+  //             <small className="text-xs text-gray-400 mt-1">
+  //               from {formatDate(effective.nextBookingStarts)}
+  //             </small>
+  //           )}
+  //         </div>
+  //       );
+  //     }
+  //     return (
+  //       <div className="flex flex-col items-end">
+  //         <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
+  //           Available — reserved in {plural(days, "day")}
+  //         </span>
+  //         {effective.nextBookingStarts && (
+  //           <small className="text-xs text-gray-400 mt-1">
+  //             from {formatDate(effective.nextBookingStarts)}
+  //           </small>
+  //         )}
+  //       </div>
+  //     );
+  //   }
+
+  //   return (
+  //     <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
+  //       Available
+  //     </span>
+  //   );
+  // };
+
   const renderAvailabilityBadge = (rawAvailability, car) => {
     const effective = computeEffectiveAvailability(car);
-    if (!effective)
-      return (
-        <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-          Available
-        </span>
-      );
+
+    if (!effective) return <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">Có sẵn</span>;
 
     if (effective.state === "booked") {
       if (effective.until) {
         const meta = computeAvailableMeta(effective.until);
+
         if (meta?.availableIso) {
           return (
-            <div className="flex flex-col items-end">
-              <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-                Booked — available on {formatDate(meta.availableIso)}
-              </span>
-              <small className="text-xs text-gray-400 mt-1">
-                until {formatDate(effective.until)}
-              </small>
-            </div>
+            <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
+              Đã được đặt — có sẵn từ {formatDate(meta.availableIso)}
+            </span>
           );
         }
-        return (
-          <div className="flex flex-col items-end">
-            <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-              Booked
-            </span>
-            {effective.until && (
-              <small className="text-xs text-gray-400 mt-1">
-                until {formatDate(effective.until)}
-              </small>
-            )}
-          </div>
-        );
+
+        return <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">Đã được đặt</span>;
       }
-      return (
-        <div className="flex flex-col items-end">
-          <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">
-            Booked
-          </span>
-        </div>
-      );
+
+      return <span className="px-2 py-1 text-xs rounded-md bg-red-50 text-red-700 font-semibold">Đã được đặt</span>;
     }
 
     if (effective.state === "available_until_reservation") {
       const days = Number(effective.daysAvailable ?? -1);
+
       if (!Number.isFinite(days) || days < 0) {
         return (
-          <div className="flex flex-col items-end">
-            <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-              Available
-            </span>
+          <span>
+            Có sẵn
             {effective.nextBookingStarts && (
-              <small className="text-xs text-gray-400 mt-1">
-                from {formatDate(effective.nextBookingStarts)}
-              </small>
+              <span> từ {formatDate(effective.nextBookingStarts)}</span>
             )}
-          </div>
+          </span>
         );
       }
+
       return (
-        <div className="flex flex-col items-end">
-          <span className="px-2 py-1 text-xs rounded-md bg-amber-50 text-amber-800 font-semibold">
-            Available — reserved in {plural(days, "day")}
-          </span>
+        <span>
+          Có sẵn — sẽ được đặt sau {days} ngày
           {effective.nextBookingStarts && (
-            <small className="text-xs text-gray-400 mt-1">
-              from {formatDate(effective.nextBookingStarts)}
-            </small>
+            <span> từ {formatDate(effective.nextBookingStarts)}</span>
           )}
-        </div>
+        </span>
       );
     }
 
-    return (
-      <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">
-        Available
-      </span>
-    );
+    return <span className="px-2 py-1 text-xs rounded-md bg-green-50 text-green-700">Có sẵn</span>;
   };
 
   const isBookDisabled = (car) => {
@@ -289,6 +339,7 @@ const HomeCars = () => {
   };
 
   const visibleCars = [...cars]
+    .filter((car) => String(car.status || "available") !== "maintenance")
     .filter((car) => !isBookDisabled(car))
     .sort((a, b) => {
       const dateA = new Date(a?.createdAt || 0).getTime();
